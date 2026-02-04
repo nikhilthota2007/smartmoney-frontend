@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { DollarSign, TrendingUp, PiggyBank, Send, Loader2, Sparkles, MessageCircle, Activity, X, Calculator, Plus, Trash2, RotateCcw, Moon, Sun } from 'lucide-react';
+import { DollarSign, TrendingUp, PiggyBank, Send, Sparkles, MessageCircle, Activity, X, Calculator, Plus, Trash2, RotateCcw, Moon, Sun } from 'lucide-react';
 import './index.css';
 
 const EXAMPLE_QUESTIONS = [
