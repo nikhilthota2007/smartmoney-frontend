@@ -367,7 +367,7 @@ export default function FinancialAdvisor() {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8080/api/chat', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/api/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
