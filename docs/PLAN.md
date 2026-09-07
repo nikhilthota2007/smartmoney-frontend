@@ -165,7 +165,23 @@ src/
 
 State: React Context + `useReducer` for the profile — Redux is overkill here and a single shared context keeps the "one source of truth" property that §3 depends on.
 
-**Backend** (Spring Boot, existing repo): `/api/chat` (SSE), `/api/profile` (CRUD), `/api/plan` (generate/recompute), `/api/scenarios`, `/api/health`. Postgres for profiles/goals/chat history. **API keys stay server-side** — this is already correct in the current design and must not regress into the frontend.
+### Backend: what is actually there
+
+Written after reading [`smartmoney-backend`](https://github.com/nikhilthota2007/smartmoney-backend) rather than assuming. It is small — 333 lines of Java, Spring Boot 4.0.1 on Java 21, deployed to Railway.
+
+| Piece | State |
+|---|---|
+| `FinancialAdvisorController` | `POST /api/chat`, `GET /api/health`. CORS from `${FRONTEND_URL}`. |
+| `AdvisorService` | Calls Groq's OpenAI-compatible endpoint with `llama-3.3-70b-versatile`. Was named `GeminiService`; it has never called Gemini. |
+| `FinancialData` | The same five string fields as the frontend's `summary`. The v2 schema's `toFinancialData()` maps onto it exactly, so no backend change was needed for Phase 0. |
+| System prompt | Strongly anti-debt advisory persona. Now versioned in `resources/prompts/`. |
+| Persistence | None. No database, no user records — matching the frontend's `localStorage`-only state. |
+
+**Fixed in the guardrails pass:** the prompt moved out of Java string concatenation into a versioned file with a `SAFETY AND SCOPE` section (disclaimer framing, professional escalation, no specific securities, no invented figures), asserted by tests that fail the build if a guardrail is removed. Exception messages no longer reach the browser. `RestTemplate` is a single bean with timeouts. `contextLoads` passes without a real API key — it never had.
+
+**Still open, and this is the important one:** the model receives only the five raw figures and does its own arithmetic in prose. It has no access to the health score, the payoff schedule, or anything else `src/lib/` computes. Guardrail 4 tells it to ask rather than invent, which is a mitigation, not a fix — the fix is the tool-calling architecture in §6, and it is the single largest remaining gap between this app and a trustworthy advisor.
+
+**Still to build** (unchanged from the original plan): `/api/chat` as SSE, `/api/profile` (CRUD), `/api/plan` (generate/recompute), `/api/scenarios`. Postgres for profiles, goals and chat history. **API keys stay server-side** — this is already correct and must not regress into the frontend.
 
 **Auth:** email magic-link or OAuth. Until it ships, encrypted `localStorage` with an explicit "your data is on this device only" notice, and a JSON export/import so a user can move it.
 
