@@ -211,12 +211,16 @@ Phases are sequenced so each one ships something usable. Estimates assume part-t
 
 **One deviation from this plan, deliberately.** The plan said to fold insurance and retirement into the health score. They are shown *beside* it instead, as a checklist. Changing the score's components would make the number incomparable over time — a user who fills in more of their profile would see their score move for reasons unrelated to their finances improving. The three core components (savings rate, debt load, emergency runway) apply to every household and stay fixed at 100 points; the checklist carries the added detail. See the note at the top of `src/lib/protection.js`.
 
-### Phase 2 — Grounded advisor *(~2 weeks)*
-- Context builder + tool-calling backend; streaming responses.
-- Conversational profile updates (`update_profile`) with a visible "I updated your profile" confirmation the user can undo.
-- Persisted chat history; multiple named conversations.
-- Guardrails, disclaimers, tool-call logging.
-- *Done when:* the advisor answers with the user's real numbers and can fill gaps by asking.
+### Phase 2 — Grounded advisor *(in progress)*
+- ✅ **Guardrails, disclaimers, versioned prompt** — see the backend section in §7.
+- ✅ **Context builder** (`src/lib/aiContext.js`). Every figure the UI computes now reaches the model: derived metrics, the health score and its components, per-debt terms with the never-paid-off flag, payoff timelines under three payment scenarios, coverage gaps, and an explicit list of what the user has not entered. Rounded on the way out, and bounded so a long list cannot blow the context.
+- ✅ **Cross-repo contract test.** The exact payload the frontend emits is checked in on both sides; the backend asserts it binds to its records with nothing dropped, the frontend asserts it still emits it. A renamed field fails both, rather than silently deserializing to null and costing the model a figure.
+- ⬜ **Tool calling** for parameterized what-ifs — the remaining gap, see below.
+- ⬜ Streaming responses (SSE).
+- ⬜ Conversational profile updates (`update_profile`) with a visible, undoable confirmation.
+- ⬜ Persisted chat history; multiple named conversations.
+
+**Grounding is not the same as tool calling, and the difference matters.** Precomputing works for the *baseline* picture, which is a small bounded set of figures the UI already calculates. It cannot answer "what if I paid $500 extra?", because that is a parameterized computation over an unbounded input space. Prompt v3 is explicit about this boundary: the model may quote the computed figures and do simple arithmetic on them, but must refuse to invent a compound projection and point at the calculator instead. That is an honest limit, not a fix — tool calling is what removes it.
 
 ### Phase 3 — Planning *(~3 weeks)*
 - Goal creation and tracking; the allocation waterfall.
@@ -281,12 +285,15 @@ Add CI on PRs at Phase 0, not Phase 5.
 
 ## 12. Immediate next steps
 
-Phases 0 and 1 have landed, along with the backend guardrails pass. Phase 2 starts here:
+Phases 0 and 1 are complete. Phase 2 is part-done: the advisor is grounded, but cannot yet compute anything parameterized.
 
-1. **Tool-calling backend.** This is the gap that matters. Define the tool schemas in §6, expose `src/lib/` equivalents server-side (or call the frontend's), and stop the model doing arithmetic. Everything else in this list is smaller.
-2. **Streaming.** Replace the blocking `postForObject` with SSE so answers appear as they are generated.
-3. **Context builder** (`src/lib/aiContext.js`): profile summary + derived metrics + the completeness gaps, serialized compactly and capped to a token budget. The wizard now produces enough structure to make this worth doing.
-4. **Persisted chat history**, and conversational profile updates via `update_profile` — the wizard's sections are the write targets.
-5. **Golden-question suite.** `AdvisorPromptTest` already pins the guardrails; extend it to ~30 questions checking that stated figures match tool outputs.
+1. **Tool calling.** The remaining gap. Groq's API is OpenAI-compatible, so `tools` and a multi-turn loop are available. The tools worth exposing first are `simulate_extra_payment(amount)`, `compare_debt_strategies(extraPayment)` and `evaluate_goal(goalId)` — all three are thin wrappers over functions that already exist in `src/lib/planner/`.
 
-Phase 3 (the planning engine) depends on 1 and 3 being in place.
+   **Where the tools execute is the real decision.** Porting the maths to Java gives two implementations that can disagree, which is what §5 exists to prevent. The alternative is for the backend to return tool-call requests, the frontend to execute them against `src/lib/`, and the frontend to re-post with the results — one implementation, at the cost of an extra round trip per tool call. The second is preferable, and the contract test established in this phase is the pattern for keeping that seam honest.
+
+2. **Streaming.** Replace the blocking `postForObject` with SSE.
+3. **`update_profile`** so the advisor can fill gaps conversationally, writing into the wizard's sections, with a visible and undoable confirmation.
+4. **Persisted chat history**, multiple named conversations.
+5. **Golden-question suite.** `AdvisorPromptTest` pins the guardrails; extend it to ~30 questions checking that stated figures match the context. This needs a real API key, so it belongs in CI as an opt-in job rather than a required one.
+
+Phase 3 (the planning engine) depends on 1.
