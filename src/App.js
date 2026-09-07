@@ -7,8 +7,8 @@ import IntakeWizard from './components/intake/IntakeWizard';
 import ChatWindow from './components/chat/ChatWindow';
 
 const AdvisorScreens = () => {
-  const { financialData } = useProfile();
-  const chat = useChat(financialData);
+  const { profile } = useProfile();
+  const chat = useChat(profile);
   const [showChat, setShowChat] = useState(false);
 
   const startChat = () => {

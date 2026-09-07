@@ -1,0 +1,198 @@
+{
+  "profile": {
+    "schemaVersion": 2,
+    "createdAt": "2026-09-07T22:29:40.651Z",
+    "updatedAt": "2026-09-07T22:29:40.651Z",
+    "summary": {
+      "monthlyIncome": "",
+      "monthlyExpenses": "",
+      "savings": "",
+      "debts": "",
+      "goals": ""
+    },
+    "household": {
+      "filingStatus": "single",
+      "dependents": "2",
+      "state": "CA",
+      "birthYear": "1990"
+    },
+    "income": [
+      {
+        "id": 1,
+        "source": "Salary",
+        "netMonthly": "5000",
+        "stability": "stable"
+      }
+    ],
+    "expenses": {
+      "fixed": [
+        {
+          "id": 1,
+          "category": "housing",
+          "amount": "2000"
+        }
+      ],
+      "variable": [
+        {
+          "id": 1,
+          "category": "groceries",
+          "amount": "1500"
+        }
+      ]
+    },
+    "debts": [
+      {
+        "id": 1,
+        "name": "Card",
+        "type": "card",
+        "balance": "5000",
+        "interestRate": "22.99",
+        "minPayment": "150"
+      },
+      {
+        "id": 2,
+        "name": "Runaway",
+        "type": "card",
+        "balance": "20000",
+        "interestRate": "29.99",
+        "minPayment": "50"
+      }
+    ],
+    "assets": [
+      {
+        "id": 1,
+        "name": "Savings",
+        "type": "savings",
+        "balance": "10000",
+        "monthlyContribution": "200",
+        "employerMatchPct": ""
+      },
+      {
+        "id": 2,
+        "name": "Work 401k",
+        "type": "401k",
+        "balance": "95000",
+        "monthlyContribution": "",
+        "employerMatchPct": "5"
+      }
+    ],
+    "protection": {
+      "emergencyFundTarget": "15000",
+      "insurance": {
+        "health": true,
+        "life": false,
+        "disability": false,
+        "renters": false
+      }
+    },
+    "riskProfile": {
+      "toleranceScore": null,
+      "horizonYears": "",
+      "questionnaireAnswers": []
+    },
+    "goals": [
+      {
+        "id": 1,
+        "name": "House",
+        "type": "purchase",
+        "targetAmount": "60000",
+        "targetDate": "2029-06"
+      }
+    ]
+  },
+  "context": {
+    "metrics": {
+      "monthlyIncome": 5000,
+      "monthlyExpenses": 3500,
+      "monthlySurplus": 1500,
+      "savingsRatePct": 30,
+      "debtToIncomePct": 41.7,
+      "emergencyFundMonths": 2.9,
+      "liquidSavings": 10000,
+      "totalDebt": 25000,
+      "netWorth": -15000
+    },
+    "healthScore": {
+      "total": 50,
+      "rating": "Fair",
+      "components": [
+        {
+          "name": "Savings rate",
+          "score": 40,
+          "max": 40
+        },
+        {
+          "name": "Debt to income",
+          "score": 0,
+          "max": 30
+        },
+        {
+          "name": "Emergency fund",
+          "score": 10,
+          "max": 30
+        }
+      ]
+    },
+    "debts": [
+      {
+        "name": "Card",
+        "type": "card",
+        "balance": 5000,
+        "aprPct": 23,
+        "minPayment": 150,
+        "neverPaidOffAtMinimum": false
+      },
+      {
+        "name": "Runaway",
+        "type": "card",
+        "balance": 20000,
+        "aprPct": 30,
+        "minPayment": 50,
+        "neverPaidOffAtMinimum": true
+      }
+    ],
+    "debtPayoff": {
+      "extraPayment": 500,
+      "recommendedExtraPayment": 400,
+      "avalanche": {
+        "months": 98,
+        "totalInterest": 36500,
+        "totalPaid": 61500,
+        "monthlyPayment": 700,
+        "clearsWithinProjection": true
+      },
+      "snowball": {
+        "months": 93,
+        "totalInterest": 39636.19,
+        "totalPaid": 64636.19,
+        "monthlyPayment": 700,
+        "clearsWithinProjection": true
+      },
+      "atRecommendedPayment": {
+        "months": 600,
+        "totalInterest": 253100,
+        "totalPaid": 278100,
+        "monthlyPayment": 600,
+        "clearsWithinProjection": false
+      }
+    },
+    "goals": [
+      {
+        "name": "House",
+        "type": "purchase",
+        "targetAmount": 60000,
+        "targetDate": "2029-06"
+      }
+    ],
+    "protectionGaps": [
+      "Disability insurance",
+      "Life insurance",
+      "Renters or home insurance",
+      "Retirement saving",
+      "Employer match",
+      "Emergency fund target"
+    ],
+    "missing": [],
+    "completenessPct": 100
+  }
+}

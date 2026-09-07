@@ -1,5 +1,7 @@
 import { useCallback, useState } from 'react';
 import { sendChatMessage } from '../lib/api';
+import { buildAdvisorContext } from '../lib/aiContext';
+import { toFinancialData } from '../lib/profile';
 
 export const GREETING =
   "Hello! I'm your AI financial advisor. I have your financial information and I'm here to help you save money and achieve your goals. What would you like to know?";
@@ -8,9 +10,11 @@ const greetingMessage = () => ({ role: 'assistant', content: GREETING });
 
 /**
  * Conversation state and the request cycle.
- * Phase 2 replaces the single fetch with a streaming, tool-calling exchange.
+ *
+ * The financial context is rebuilt on every send rather than held in state, so
+ * a figure the user edits mid-conversation is reflected in the very next answer.
  */
-export const useChat = (financialData) => {
+export const useChat = (profile) => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -36,7 +40,12 @@ export const useChat = (financialData) => {
       setLoading(true);
 
       try {
-        const reply = await sendChatMessage({ financialData, message: textToSend, history });
+        const reply = await sendChatMessage({
+          financialData: toFinancialData(profile),
+          financialContext: buildAdvisorContext(profile),
+          message: textToSend,
+          history,
+        });
         setMessages((prev) => [...prev, { role: 'assistant', content: reply }]);
       } catch (error) {
         setMessages((prev) => [
@@ -50,7 +59,7 @@ export const useChat = (financialData) => {
         setLoading(false);
       }
     },
-    [financialData, input, loading, messages]
+    [profile, input, loading, messages]
   );
 
   return { messages, input, setInput, loading, sendMessage, clearChat, startConversation };
