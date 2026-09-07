@@ -1,0 +1,161 @@
+/* Dark Mode Toggle Button */
+.dark-mode-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: white;
+  border: 2px solid #e2e8f0;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  z-index: 1001;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.dark-mode-toggle:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.dark-mode-toggle svg {
+  color: #667eea;
+}
+
+/* Dark Mode Styles */
+body.dark-mode {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+}
+
+body.dark-mode .form-container-centered,
+body.dark-mode .chat-container-large,
+body.dark-mode .modal-content {
+  background: #2d2d44;
+  color: #e0e0e0;
+}
+
+body.dark-mode .chat-header {
+  background: linear-gradient(135deg, #4a4a6a 0%, #3d3d5c 100%);
+}
+
+body.dark-mode .messages-area {
+  background: #232338;
+}
+
+body.dark-mode .message.assistant .message-bubble {
+  background: #3d3d5c;
+  border-color: #4a4a6a;
+  color: #e0e0e0;
+}
+
+body.dark-mode .message.user .message-bubble {
+  background: #5568d3;
+}
+
+body.dark-mode .chat-input,
+body.dark-mode input[type="number"],
+body.dark-mode textarea {
+  background: #3d3d5c;
+  border-color: #4a4a6a;
+  color: #e0e0e0;
+}
+
+body.dark-mode .chat-input::placeholder,
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+  color: #888;
+}
+
+body.dark-mode .example-questions {
+  background: #3d3d5c;
+  border-color: #4a4a6a;
+}
+
+body.dark-mode .example-btn {
+  background: #2d2d44;
+  border-color: #4a4a6a;
+  color: #e0e0e0;
+}
+
+body.dark-mode .example-btn:hover {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode .form-label,
+body.dark-mode .section-header {
+  color: #e0e0e0;
+}
+
+body.dark-mode .subtitle,
+body.dark-mode .disclaimer-inline {
+  color: #b0b0b0;
+}
+
+body.dark-mode .health-score-card,
+body.dark-mode .calculator-card {
+  background: #2d2d44;
+}
+
+body.dark-mode .score-circle {
+  background: linear-gradient(135deg, #3d3d5c 0%, #2d2d44 100%);
+}
+
+body.dark-mode .debt-row {
+  background: #3d3d5c;
+  border-color: #4a4a6a;
+}
+
+body.dark-mode .debt-input {
+  background: #2d2d44;
+  border-color: #4a4a6a;
+  color: #e0e0e0;
+}
+
+body.dark-mode .total-summary {
+  background: linear-gradient(135deg, #1a4d2e 0%, #0f3a1f 100%);
+  border-color: #10b981;
+}
+
+body.dark-mode .extra-payment-section-single {
+  background: #1e3a5f;
+  border-color: #3b82f6;
+}
+
+body.dark-mode .strategy-card-full {
+  background: #3d3d5c;
+}
+
+body.dark-mode .encouragement-message {
+  background: linear-gradient(135deg, #1e3a5f 0%, #2d4a7c 100%);
+}
+
+body.dark-mode .dark-mode-toggle {
+  background: #3d3d5c;
+  border-color: #4a4a6a;
+}
+
+body.dark-mode .dark-mode-toggle svg {
+  color: #fbbf24;
+}
+
+body.dark-mode .modal-close {
+  background: #3d3d5c;
+}
+
+body.dark-mode .modal-close:hover {
+  background: #4a4a6a;
+}
+
+body.dark-mode .input-wrapper .dollar-sign,
+body.dark-mode .input-prefix,
+body.dark-mode .input-suffix {
+  color: #888;
+}

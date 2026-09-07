@@ -17,9 +17,10 @@ An intelligent financial advisory application that provides personalized money-s
 
 ## Technology Stack
 
-- **Frontend Framework:** React.js
-- **Styling:** Tailwind CSS
+- **Frontend Framework:** React 19 (Create React App)
+- **Styling:** Hand-written CSS, split by component under `src/styles/`
 - **Icons:** Lucide React
+- **Testing:** Jest + React Testing Library
 - **Hosting:** Vercel
 - **Backend Integration:** RESTful API
 
@@ -55,9 +56,50 @@ npm start
 
 5. Open your browser and navigate to `http://localhost:3000`
 
+## Available Scripts
+
+| Command | What it does |
+|---|---|
+| `npm start` | Development server on port 3000 |
+| `npm test` | Jest in watch mode (`CI=true npm test` for a single run) |
+| `npm run lint` | ESLint over `src/` |
+| `npm run build` | Production build |
+
 ## Project Structure
 
 The application consists of a React frontend that communicates with a Java Spring Boot backend. User financial data is processed through the backend API, which interfaces with Groq's AI model to generate personalized financial advice.
+
+```
+src/
+├── components/       UI, grouped by feature
+│   ├── common/       Modal, currency field, dark-mode toggle
+│   ├── intake/       Financial information form
+│   ├── chat/         Conversation view and message rendering
+│   ├── dashboard/    Financial health score
+│   └── planning/     Debt payoff calculator
+├── context/          Profile and theme state
+├── hooks/            useChat
+├── lib/              Financial logic, kept free of React
+│   ├── derive.js     Derived metrics (savings rate, DTI, runway)
+│   ├── healthScore.js
+│   ├── planner/      Debt payoff simulation
+│   ├── profile.js    Profile schema and migrations
+│   ├── storage.js    localStorage persistence
+│   └── api.js        Backend client
+└── styles/           CSS, imported in cascade order by index.css
+```
+
+**All financial calculations live in `src/lib/` as pure functions** and are covered by
+characterization tests (`src/lib/__tests__/`) that pin their output against golden
+values. The AI calls into this logic rather than doing arithmetic itself.
+
+The user's financial profile is stored in `localStorage` on their own device and is
+versioned — see `migrateProfile` in `src/lib/profile.js`. There is no account system yet.
+
+## Roadmap
+
+See [`docs/PLAN.md`](docs/PLAN.md) for the full build plan. Phase 0 (foundation) is
+complete; Phase 1 replaces the five-field form with a guided intake wizard.
 
 ## Related Repositories
 

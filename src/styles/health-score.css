@@ -1,0 +1,159 @@
+.health-score-card {
+  padding: 32px 28px;
+}
+
+.health-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  color: #1a202c;
+}
+
+.health-header svg {
+  color: #667eea;
+}
+
+.health-header h2 {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.score-circle {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  border: 8px solid;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+}
+
+.score-number {
+  font-size: 56px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.score-label {
+  font-size: 13px;
+  color: #718096;
+  margin-top: 4px;
+}
+
+.score-rating {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.rating-icon {
+  font-size: 24px;
+}
+
+.encouragement-message {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border-left: 4px solid #3b82f6;
+  padding: 16px 18px;
+  border-radius: 10px;
+  margin-bottom: 24px;
+}
+
+.encouragement-message p {
+  margin: 0;
+  color: #1e40af;
+  font-size: 14px;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+.score-breakdown {
+  margin-top: 24px;
+}
+
+.breakdown-item {
+  margin-bottom: 24px;
+}
+
+.breakdown-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.breakdown-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #4a5568;
+}
+
+.breakdown-score {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a202c;
+}
+
+.progress-bar {
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.5s ease-out;
+}
+
+.breakdown-detail {
+  font-size: 12px;
+  color: #718096;
+}
+
+.improvement-tips {
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 2px solid #e2e8f0;
+}
+
+.improvement-tips h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 12px;
+}
+
+.tip-item {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #4a5568;
+}
+
+.tip-bullet {
+  color: #667eea;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.no-score {
+  text-align: center;
+  padding: 60px 20px;
+  color: #718096;
+  font-size: 15px;
+}
+
