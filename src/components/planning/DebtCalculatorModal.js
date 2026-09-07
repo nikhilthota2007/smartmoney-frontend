@@ -3,7 +3,9 @@ import { Calculator, Plus } from 'lucide-react';
 import Modal from '../common/Modal';
 import DebtRow from './DebtRow';
 import StrategyCard from './StrategyCard';
+import DebtWarnings from './DebtWarnings';
 import { calculateMultipleDebts } from '../../lib/planner/debt';
+import { findUnpayableDebts, hitsPayoffHorizon } from '../../lib/planner/debtWarnings';
 import { formatCurrency } from '../../lib/format';
 import { useProfile } from '../../context/ProfileContext';
 
@@ -16,6 +18,7 @@ const DebtCalculatorModal = ({ onClose, extraPayment, onExtraPaymentChange }) =>
 
   const current = results?.scenarios[0];
   const recommended = results?.recommended;
+  const unpayable = findUnpayableDebts(debts);
 
   return (
     <Modal onClose={onClose} wide>
@@ -45,6 +48,8 @@ const DebtCalculatorModal = ({ onClose, extraPayment, onExtraPaymentChange }) =>
             />
           ))}
         </div>
+
+        <DebtWarnings unpayable={unpayable} hitsHorizon={hitsPayoffHorizon(current?.avalanche)} />
 
         {results ? (
           <>

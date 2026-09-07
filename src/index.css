@@ -11,4 +11,6 @@
 @import './styles/modal.css';
 @import './styles/health-score.css';
 @import './styles/debt-calculator.css';
+@import './styles/wizard.css';
+@import './styles/status.css';
 @import './styles/theme.css';

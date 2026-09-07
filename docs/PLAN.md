@@ -200,12 +200,16 @@ Phases are sequenced so each one ships something usable. Estimates assume part-t
 - ✅ README corrected; `DISABLE_ESLINT_PLUGIN=true` removed from the build after fixing the underlying lint error; `npm run lint` added.
 - *Result:* 337 tests passing, ESLint clean, `CI=true npm run build` green with linting enabled.
 
-### Phase 1 — Real intake *(~2 weeks)*
-- 5-step wizard, resumable, with the completeness meter.
-- Full debts/assets/expense-category capture; delete the duplicate debt entry in the calculator modal by reading from the shared profile.
-- Extended health score using the richer data (add insurance coverage and retirement-contribution factors).
-- Export/import profile as JSON.
-- *Done when:* a user can enter a complete picture in under 5 minutes and it survives a refresh.
+### Phase 1 — Real intake ✅ *complete*
+- ✅ 5-step wizard (Income → Expenses → Debts → Assets → Goals), every step skippable, resuming at the first gap. Steps are declared as data in `src/components/intake/steps.js`; one `ListEditor` renders all of them.
+- ✅ Completeness meter, weighted by what each section unlocks rather than field count.
+- ✅ Full itemized capture. The five headline figures are now *derived* from the structured data (`deriveSummary`), falling back to hand-entered values so nothing a user typed on the old form is lost. The calculator and the wizard share one debt list.
+- ✅ Export/import profile as JSON, including older exports, which migrate on load.
+- ✅ Coverage & retirement checks (health, disability, life, renters, retirement contributions, employer match, emergency-fund target).
+- ✅ The payoff-horizon bug is surfaced: a debt whose minimum never covers its interest is now named as such instead of being reported as a 50-year payoff.
+- *Result:* 391 tests passing, ESLint clean, production build green.
+
+**One deviation from this plan, deliberately.** The plan said to fold insurance and retirement into the health score. They are shown *beside* it instead, as a checklist. Changing the score's components would make the number incomparable over time — a user who fills in more of their profile would see their score move for reasons unrelated to their finances improving. The three core components (savings rate, debt load, emergency runway) apply to every household and stay fixed at 100 points; the checklist carries the added detail. See the note at the top of `src/lib/protection.js`.
 
 ### Phase 2 — Grounded advisor *(~2 weeks)*
 - Context builder + tool-calling backend; streaming responses.
@@ -277,12 +281,12 @@ Add CI on PRs at Phase 0, not Phase 5.
 
 ## 12. Immediate next steps
 
-Phase 0 has landed. Phase 1 starts here:
+Phases 0 and 1 have landed, along with the backend guardrails pass. Phase 2 starts here:
 
-1. Build the five-step wizard shell over the existing `ProfileContext`, writing into the v2 sections (`income[]`, `expenses`, `assets[]`, `goals[]`) that are currently defined but unpopulated.
-2. Point the debt calculator at `profile.debts` as its only source — the duplicate debt entry is already gone from component state, so this is now a UI change alone.
-3. Add the completeness meter, reading from a new `profileCompleteness()` in `src/lib/profile.js`.
-4. Extend the health score with the richer data (insurance coverage, retirement contributions) — extending `deriveMetrics` first, so the score and the future planner stay in agreement.
-5. Surface the payoff-horizon case: a debt whose minimum never covers its interest currently caps out silently at 600 months (pinned in the characterization tests). It should be reported to the user as "this debt never gets paid off at this payment".
+1. **Tool-calling backend.** This is the gap that matters. Define the tool schemas in §6, expose `src/lib/` equivalents server-side (or call the frontend's), and stop the model doing arithmetic. Everything else in this list is smaller.
+2. **Streaming.** Replace the blocking `postForObject` with SSE so answers appear as they are generated.
+3. **Context builder** (`src/lib/aiContext.js`): profile summary + derived metrics + the completeness gaps, serialized compactly and capped to a token budget. The wizard now produces enough structure to make this worth doing.
+4. **Persisted chat history**, and conversational profile updates via `update_profile` — the wizard's sections are the write targets.
+5. **Golden-question suite.** `AdvisorPromptTest` already pins the guardrails; extend it to ~30 questions checking that stated figures match tool outputs.
 
-Item 5 is the one real bug the Phase 0 tests uncovered.
+Phase 3 (the planning engine) depends on 1 and 3 being in place.

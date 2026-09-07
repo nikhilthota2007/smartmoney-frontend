@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Calculator, DollarSign, RotateCcw, Sparkles } from 'lucide-react';
+import { Calculator, DollarSign, RotateCcw, Sparkles, SlidersHorizontal } from 'lucide-react';
 import DarkModeToggle from '../common/DarkModeToggle';
 import MessageList from './MessageList';
 import ChatInput from './ChatInput';
 import HealthScoreModal from '../dashboard/HealthScoreModal';
 import DebtCalculatorModal from '../planning/DebtCalculatorModal';
 
-const ChatWindow = ({ chat }) => {
+const ChatWindow = ({ chat, onEditFinances }) => {
   const { messages, input, setInput, loading, sendMessage, clearChat } = chat;
   const [showHealthScore, setShowHealthScore] = useState(false);
   const [showCalculator, setShowCalculator] = useState(false);
@@ -33,10 +33,16 @@ const ChatWindow = ({ chat }) => {
               <DollarSign size={32} />
               SmartMoney
             </h1>
-            <button className="clear-chat-btn" onClick={clearChat} title="Clear Chat">
-              <RotateCcw size={18} />
-              <span>Clear Chat</span>
-            </button>
+            <div className="chat-header-actions">
+              <button className="clear-chat-btn" onClick={onEditFinances} title="Edit your financial information">
+                <SlidersHorizontal size={18} />
+                <span>My Finances</span>
+              </button>
+              <button className="clear-chat-btn" onClick={clearChat} title="Clear Chat">
+                <RotateCcw size={18} />
+                <span>Clear Chat</span>
+              </button>
+            </div>
           </div>
           <p className="ai-badge">
             <Sparkles size={16} />

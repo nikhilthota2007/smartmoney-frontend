@@ -8,12 +8,13 @@ An intelligent financial advisory application that provides personalized money-s
 
 ## Features
 
+- Guided five-step intake for income, expenses, debts, accounts and goals, with a completeness meter
 - AI-powered financial advice using Groq's LLaMA model
-- Personalized budgeting recommendations based on income and expenses
-- Debt payoff calculator with multiple payment strategies
+- Financial health scoring, with coverage and retirement checks alongside it
+- Debt payoff calculator with multiple payment strategies, which warns when a minimum payment never covers the interest
+- Profile saved on your own device, with JSON export and import
 - Dark mode interface
 - Responsive design optimized for mobile and desktop
-- Financial health scoring system
 
 ## Technology Stack
 
@@ -73,7 +74,7 @@ The application consists of a React frontend that communicates with a Java Sprin
 src/
 ├── components/       UI, grouped by feature
 │   ├── common/       Modal, currency field, dark-mode toggle
-│   ├── intake/       Financial information form
+│   ├── intake/       Five-step intake wizard
 │   ├── chat/         Conversation view and message rendering
 │   ├── dashboard/    Financial health score
 │   └── planning/     Debt payoff calculator
@@ -82,8 +83,10 @@ src/
 ├── lib/              Financial logic, kept free of React
 │   ├── derive.js     Derived metrics (savings rate, DTI, runway)
 │   ├── healthScore.js
-│   ├── planner/      Debt payoff simulation
-│   ├── profile.js    Profile schema and migrations
+│   ├── protection.js Coverage and retirement checks
+│   ├── planner/      Debt payoff simulation and warnings
+│   ├── profile.js    Profile schema, migrations and derived summary
+│   ├── profileFile.js JSON export and import
 │   ├── storage.js    localStorage persistence
 │   └── api.js        Backend client
 └── styles/           CSS, imported in cascade order by index.css
@@ -98,8 +101,9 @@ versioned — see `migrateProfile` in `src/lib/profile.js`. There is no account 
 
 ## Roadmap
 
-See [`docs/PLAN.md`](docs/PLAN.md) for the full build plan. Phase 0 (foundation) is
-complete; Phase 1 replaces the five-field form with a guided intake wizard.
+See [`docs/PLAN.md`](docs/PLAN.md) for the full build plan. Phase 0 (foundation) and
+Phase 1 (guided intake) are complete. Phase 2 makes the advisor call the financial
+logic as tools instead of doing its own arithmetic.
 
 ## Related Repositories
 
