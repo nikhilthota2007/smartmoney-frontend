@@ -18,7 +18,8 @@ describe('migrateProfile', () => {
 
     expect(migrated.schemaVersion).toBe(SCHEMA_VERSION);
     expect(migrated.summary).toEqual(v1);
-    expect(migrated.debts).toHaveLength(1);
+    // Structured sections start empty; the wizard fills them in.
+    expect(migrated.debts).toEqual([]);
     expect(migrated.expenses).toEqual({ fixed: [], variable: [] });
   });
 

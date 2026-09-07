@@ -1,39 +1,58 @@
 import React, { createContext, useContext, useEffect, useMemo, useReducer } from 'react';
-import { createEmptyDebt, createEmptyProfile, toFinancialData } from '../lib/profile';
+import { LIST_SECTIONS, createEmptyProfile, getSectionList, migrateProfile, toFinancialData } from '../lib/profile';
 import { loadProfile, saveProfile, clearProfile } from '../lib/storage';
 
 const ProfileContext = createContext(null);
 
 const touch = (profile) => ({ ...profile, updatedAt: new Date().toISOString() });
 
+/** Replace one repeating section, wherever it lives in the profile tree. */
+const withSection = (profile, section, nextList) => {
+  const [head, tail] = LIST_SECTIONS[section].path;
+  if (!tail) return { ...profile, [head]: nextList };
+  return { ...profile, [head]: { ...profile[head], [tail]: nextList } };
+};
+
+const nextId = (list) => Math.max(...list.map((item) => item.id), 0) + 1;
+
 export const profileReducer = (profile, action) => {
   switch (action.type) {
     case 'SET_SUMMARY_FIELD':
+      return touch({ ...profile, summary: { ...profile.summary, [action.field]: action.value } });
+
+    case 'SET_INSURANCE':
       return touch({
         ...profile,
-        summary: { ...profile.summary, [action.field]: action.value },
+        protection: {
+          ...profile.protection,
+          insurance: { ...profile.protection.insurance, [action.kind]: action.covered },
+        },
       });
 
-    case 'ADD_DEBT': {
-      const nextId = Math.max(...profile.debts.map((d) => d.id), 0) + 1;
-      return touch({ ...profile, debts: [...profile.debts, createEmptyDebt(nextId)] });
+    case 'ADD_ITEM': {
+      const list = getSectionList(profile, action.section);
+      const item = { ...LIST_SECTIONS[action.section].factory(nextId(list)), ...action.values };
+      return touch(withSection(profile, action.section, [...list, item]));
     }
 
-    case 'REMOVE_DEBT':
-      // Always leave one row so the calculator never renders empty.
-      if (profile.debts.length <= 1) return profile;
-      return touch({ ...profile, debts: profile.debts.filter((d) => d.id !== action.id) });
+    case 'UPDATE_ITEM': {
+      const list = getSectionList(profile, action.section);
+      return touch(
+        withSection(
+          profile,
+          action.section,
+          list.map((item) => (item.id === action.id ? { ...item, [action.field]: action.value } : item))
+        )
+      );
+    }
 
-    case 'UPDATE_DEBT':
-      return touch({
-        ...profile,
-        debts: profile.debts.map((d) =>
-          d.id === action.id ? { ...d, [action.field]: action.value } : d
-        ),
-      });
+    case 'REMOVE_ITEM': {
+      const list = getSectionList(profile, action.section);
+      return touch(withSection(profile, action.section, list.filter((item) => item.id !== action.id)));
+    }
 
     case 'REPLACE_PROFILE':
-      return touch(action.profile);
+      return touch(migrateProfile(action.profile));
 
     case 'RESET':
       return createEmptyProfile();
@@ -59,10 +78,20 @@ export const ProfileProvider = ({ children }) => {
       profile,
       financialData: toFinancialData(profile),
       debts: profile.debts,
+
       setSummaryField: (field, value) => dispatch({ type: 'SET_SUMMARY_FIELD', field, value }),
-      addDebt: () => dispatch({ type: 'ADD_DEBT' }),
-      removeDebt: (id) => dispatch({ type: 'REMOVE_DEBT', id }),
-      updateDebt: (id, field, value) => dispatch({ type: 'UPDATE_DEBT', id, field, value }),
+      setInsurance: (kind, covered) => dispatch({ type: 'SET_INSURANCE', kind, covered }),
+
+      addItem: (section, values) => dispatch({ type: 'ADD_ITEM', section, values }),
+      updateItem: (section, id, field, value) => dispatch({ type: 'UPDATE_ITEM', section, id, field, value }),
+      removeItem: (section, id) => dispatch({ type: 'REMOVE_ITEM', section, id }),
+
+      // The debt calculator predates the generic list actions and still speaks
+      // in debts; these keep its call sites unchanged.
+      addDebt: () => dispatch({ type: 'ADD_ITEM', section: 'debts' }),
+      removeDebt: (id) => dispatch({ type: 'REMOVE_ITEM', section: 'debts', id }),
+      updateDebt: (id, field, value) => dispatch({ type: 'UPDATE_ITEM', section: 'debts', id, field, value }),
+
       replaceProfile: (next) => dispatch({ type: 'REPLACE_PROFILE', profile: next }),
       resetProfile: () => {
         clearProfile();

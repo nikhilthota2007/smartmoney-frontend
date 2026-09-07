@@ -2,14 +2,17 @@ import React from 'react';
 import { Activity } from 'lucide-react';
 import Modal from '../common/Modal';
 import ScoreBreakdown from './ScoreBreakdown';
+import ProtectionChecklist from './ProtectionChecklist';
 import { calculateHealthScore, getScoreRating, getImprovementTips } from '../../lib/healthScore';
+import { getProtectionChecks } from '../../lib/protection';
 import { useProfile } from '../../context/ProfileContext';
 
 const HealthScoreModal = ({ onClose }) => {
-  const { financialData } = useProfile();
+  const { profile, financialData } = useProfile();
   const healthScore = calculateHealthScore(financialData);
   const scoreRating = healthScore ? getScoreRating(healthScore.total) : null;
   const improvementTips = healthScore ? getImprovementTips(healthScore) : [];
+  const protectionChecks = getProtectionChecks(profile);
 
   return (
     <Modal onClose={onClose}>
@@ -61,6 +64,8 @@ const HealthScoreModal = ({ onClose }) => {
                 color={scoreRating.color}
               />
             </div>
+
+            <ProtectionChecklist checks={protectionChecks} />
 
             <div className="improvement-tips">
               <h3>How to Improve</h3>
