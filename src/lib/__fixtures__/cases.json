@@ -1,0 +1,44 @@
+{
+  "profiles": {
+    "typical": { "monthlyIncome": "5000", "monthlyExpenses": "3500", "savings": "10000", "debts": "5000", "goals": "Buy a house" },
+    "highEarnerNoDebt": { "monthlyIncome": "12000", "monthlyExpenses": "6000", "savings": "80000", "debts": "0", "goals": "" },
+    "deficit": { "monthlyIncome": "3000", "monthlyExpenses": "3800", "savings": "500", "debts": "22000", "goals": "" },
+    "breakEven": { "monthlyIncome": "4000", "monthlyExpenses": "4000", "savings": "0", "debts": "0", "goals": "" },
+    "zeroIncome": { "monthlyIncome": "0", "monthlyExpenses": "2000", "savings": "1000", "debts": "0", "goals": "" },
+    "emptyStrings": { "monthlyIncome": "", "monthlyExpenses": "", "savings": "", "debts": "", "goals": "" },
+    "noExpenses": { "monthlyIncome": "5000", "monthlyExpenses": "0", "savings": "9000", "debts": "1000", "goals": "" },
+    "thinMargin": { "monthlyIncome": "6000", "monthlyExpenses": "5700", "savings": "17000", "debts": "3000", "goals": "" },
+    "heavyDebt": { "monthlyIncome": "4500", "monthlyExpenses": "3000", "savings": "20000", "debts": "60000", "goals": "" }
+  },
+  "debtSets": {
+    "single": [
+      { "id": 1, "name": "Credit Card", "balance": "5000", "interestRate": "22.99", "minPayment": "150" }
+    ],
+    "three": [
+      { "id": 1, "name": "Credit Card", "balance": "8000", "interestRate": "24.99", "minPayment": "200" },
+      { "id": 2, "name": "Car Loan", "balance": "15000", "interestRate": "6.5", "minPayment": "350" },
+      { "id": 3, "name": "Student Loan", "balance": "22000", "interestRate": "5.0", "minPayment": "250" }
+    ],
+    "snowballDiverges": [
+      { "id": 1, "name": "Small High Rate", "balance": "1200", "interestRate": "29.99", "minPayment": "40" },
+      { "id": 2, "name": "Big Low Rate", "balance": "30000", "interestRate": "4.0", "minPayment": "300" }
+    ],
+    "zeroInterest": [
+      { "id": 1, "name": "Family Loan", "balance": "6000", "interestRate": "0", "minPayment": "200" }
+    ],
+    "minPaymentBelowInterest": [
+      { "id": 1, "name": "Runaway Card", "balance": "20000", "interestRate": "29.99", "minPayment": "50" }
+    ],
+    "empty": [],
+    "allInvalid": [
+      { "id": 1, "name": "Blank", "balance": "", "interestRate": "", "minPayment": "" }
+    ],
+    "partiallyInvalid": [
+      { "id": 1, "name": "Valid", "balance": "4000", "interestRate": "12", "minPayment": "120" },
+      { "id": 2, "name": "Blank", "balance": "", "interestRate": "", "minPayment": "" },
+      { "id": 3, "name": "Zero balance", "balance": "0", "interestRate": "10", "minPayment": "50" }
+    ]
+  },
+  "extraPayments": ["", "0", "100", "500"],
+  "scores": [0, 5, 39, 40, 41, 59, 60, 79, 80, 100]
+}

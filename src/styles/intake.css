@@ -1,0 +1,151 @@
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.icon-circle {
+  width: 80px;
+  height: 80px;
+  background: #667eea;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.icon-circle svg {
+  color: white;
+  width: 40px;
+  height: 40px;
+}
+
+h1 {
+  color: #1a202c;
+  font-size: 36px;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.subtitle {
+  color: #718096;
+  font-size: 16px;
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.status-badge svg {
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.1); }
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 30px 0 20px;
+  padding-top: 30px;
+  border-top: 1px solid #e2e8f0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a202c;
+}
+
+.section-header svg {
+  color: #667eea;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #4a5568;
+  margin-bottom: 8px;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.input-wrapper .dollar-sign {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #a0aec0;
+  font-size: 16px;
+}
+
+input[type="number"],
+textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all 0.3s;
+}
+
+input[type="number"] {
+  padding-left: 32px;
+}
+
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+textarea {
+  resize: vertical;
+  font-family: inherit;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-bottom: 16px;
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.disclaimer-inline {
+  text-align: center;
+  font-size: 13px;
+  color: #718096;
+  line-height: 1.5;
+  padding: 0 10px;
+}
+

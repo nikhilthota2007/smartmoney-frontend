@@ -175,13 +175,14 @@ State: React Context + `useReducer` for the profile — Redux is overkill here a
 
 Phases are sequenced so each one ships something usable. Estimates assume part-time solo work.
 
-### Phase 0 — Foundation *(~1 week)* — do this before anything else
-- Split `App.js` into the component tree above; no behavior change.
-- Extract `calculateHealthScore`, `calculateStrategy`, `calculateMultipleDebts` into `src/lib/` **with unit tests locking in current outputs first** — the tests are what make the refactor safe.
-- Introduce `ProfileContext`; add the v2 schema + v1→v2 adapter.
-- Persist profile to `localStorage` with schema versioning.
-- Split `index.css`; fix the Tailwind claim in the README.
-- *Done when:* the app behaves identically, `npm test` covers the math, and no component exceeds ~200 lines.
+### Phase 0 — Foundation ✅ *complete*
+- ✅ `App.js` split into the component tree above; 971 lines → 30.
+- ✅ Financial math extracted to `src/lib/` behind **306 characterization tests** generated from the pre-refactor implementation, so the extraction is provably output-identical.
+- ✅ `ProfileContext` + `ThemeContext`; v2 schema with a v1→v2 adapter.
+- ✅ Profile persisted to `localStorage` with schema versioning and corrupt-record recovery.
+- ✅ `index.css` split into eight files under `src/styles/`; built CSS verified rule-for-rule identical against a build of the old code.
+- ✅ README corrected; `DISABLE_ESLINT_PLUGIN=true` removed from the build after fixing the underlying lint error; `npm run lint` added.
+- *Result:* 337 tests passing, ESLint clean, `CI=true npm run build` green with linting enabled.
 
 ### Phase 1 — Real intake *(~2 weeks)*
 - 5-step wizard, resumable, with the completeness meter.
@@ -260,10 +261,12 @@ Add CI on PRs at Phase 0, not Phase 5.
 
 ## 12. Immediate next steps
 
-1. Write characterization tests for `calculateHealthScore` and `calculateMultipleDebts` against current outputs.
-2. Extract them into `src/lib/` behind those tests.
-3. Split `App.js` into the component tree in §7.
-4. Land the v2 profile schema + v1 adapter + `localStorage` persistence.
-5. Fix the README's Tailwind claim and the ESLint-disabled build.
+Phase 0 has landed. Phase 1 starts here:
 
-Phase 0 clears the way for everything else; nothing in Phases 1–5 should start before it lands.
+1. Build the five-step wizard shell over the existing `ProfileContext`, writing into the v2 sections (`income[]`, `expenses`, `assets[]`, `goals[]`) that are currently defined but unpopulated.
+2. Point the debt calculator at `profile.debts` as its only source — the duplicate debt entry is already gone from component state, so this is now a UI change alone.
+3. Add the completeness meter, reading from a new `profileCompleteness()` in `src/lib/profile.js`.
+4. Extend the health score with the richer data (insurance coverage, retirement contributions) — extending `deriveMetrics` first, so the score and the future planner stay in agreement.
+5. Surface the payoff-horizon case: a debt whose minimum never covers its interest currently caps out silently at 600 months (pinned in the characterization tests). It should be reported to the user as "this debt never gets paid off at this payment".
+
+Item 5 is the one real bug the Phase 0 tests uncovered.
