@@ -11,7 +11,14 @@ export const EXAMPLE_QUESTIONS = [
   "What's the smartest way to save for retirement?",
 ];
 
-const MessageList = ({ messages, loading, showExamples, onExampleClick }) => (
+/** What to show while a tool runs, so the pause is explained rather than blank. */
+const TOOL_LABELS = {
+  simulate_debt_payoff: 'Running your payoff numbers',
+  evaluate_goal: 'Checking whether that goal is reachable',
+  project_savings: 'Projecting your savings',
+};
+
+const MessageList = ({ messages, loading, runningTool, showExamples, onExampleClick }) => (
   <div className="messages-area">
     {messages.map((msg, idx) => (
       <div key={idx} className={`message ${msg.role}`}>
@@ -41,6 +48,7 @@ const MessageList = ({ messages, loading, showExamples, onExampleClick }) => (
       <div className="loading">
         <div className="loading-bubble">
           <div className="spinner"></div>
+          {runningTool && <span className="running-tool">{TOOL_LABELS[runningTool] || 'Calculating'}</span>}
         </div>
       </div>
     )}

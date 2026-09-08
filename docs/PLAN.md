@@ -215,12 +215,16 @@ Phases are sequenced so each one ships something usable. Estimates assume part-t
 - ✅ **Guardrails, disclaimers, versioned prompt** — see the backend section in §7.
 - ✅ **Context builder** (`src/lib/aiContext.js`). Every figure the UI computes now reaches the model: derived metrics, the health score and its components, per-debt terms with the never-paid-off flag, payoff timelines under three payment scenarios, coverage gaps, and an explicit list of what the user has not entered. Rounded on the way out, and bounded so a long list cannot blow the context.
 - ✅ **Cross-repo contract test.** The exact payload the frontend emits is checked in on both sides; the backend asserts it binds to its records with nothing dropped, the frontend asserts it still emits it. A renamed field fails both, rather than silently deserializing to null and costing the model a figure.
-- ⬜ **Tool calling** for parameterized what-ifs — the remaining gap, see below.
+- ✅ **Tool calling** for parameterized what-ifs. `simulate_debt_payoff`, `evaluate_goal` and `project_savings` execute *here*, in the browser, against `src/lib/` — the backend declares their schemas and relays the call requests but never computes, so there is exactly one implementation of the money maths. Prompt v4 moves the model from "say you cannot calculate that" to "call the tool". A second cross-repo contract covers the tool names and parameters.
 - ⬜ Streaming responses (SSE).
 - ⬜ Conversational profile updates (`update_profile`) with a visible, undoable confirmation.
 - ⬜ Persisted chat history; multiple named conversations.
 
-**Grounding is not the same as tool calling, and the difference matters.** Precomputing works for the *baseline* picture, which is a small bounded set of figures the UI already calculates. It cannot answer "what if I paid $500 extra?", because that is a parameterized computation over an unbounded input space. Prompt v3 is explicit about this boundary: the model may quote the computed figures and do simple arithmetic on them, but must refuse to invent a compound projection and point at the calculator instead. That is an honest limit, not a fix — tool calling is what removes it.
+**Grounding and tool calling do different jobs.** Precomputing covers the *baseline* picture — a small bounded set the UI already calculates. Tools cover anything parameterized, where the input space is unbounded. Together they leave the model with no reason to compute anything itself, which is what prompt v4 now requires of it.
+
+**Tools execute in the browser, not on the server.** The backend declares the schemas, relays the model's requests, and receives the results back as `role: "tool"` messages; `src/lib/tools/` runs them. Porting the maths to Java would give two implementations that can disagree, and the one the user sees on screen has to win. The cost is an extra round trip per tool call, and a loop the client has to bound — `MAX_TOOL_ROUNDS`, since the backend is stateless.
+
+**The tool boundary is hostile.** Arguments come from a language model, so every handler validates and clamps, and a bad call returns `{ error }` for the model to read rather than throwing. Tests cover unknown tools, unparseable arguments, non-object arguments, absurd values and handler failures.
 
 ### Phase 3 — Planning *(~3 weeks)*
 - Goal creation and tracking; the allocation waterfall.
@@ -287,13 +291,14 @@ Add CI on PRs at Phase 0, not Phase 5.
 
 Phases 0 and 1 are complete. Phase 2 is part-done: the advisor is grounded, but cannot yet compute anything parameterized.
 
-1. **Tool calling.** The remaining gap. Groq's API is OpenAI-compatible, so `tools` and a multi-turn loop are available. The tools worth exposing first are `simulate_extra_payment(amount)`, `compare_debt_strategies(extraPayment)` and `evaluate_goal(goalId)` — all three are thin wrappers over functions that already exist in `src/lib/planner/`.
+1. **Run it against the real Groq API.** Everything so far is verified against mocks and a stub backend, because there is no API key in this environment. The wire format is asserted in `AdvisorServiceTest` and the loop was driven end to end in a browser against a stub, but no real model has yet chosen to call these tools. **This is the first thing to do, and it is the most likely place for a surprise** — whether the model calls tools when it should, whether it obeys the "never describe the tools" instruction, and whether `llama-3.3-70b-versatile` handles multi-tool rounds well.
 
-   **Where the tools execute is the real decision.** Porting the maths to Java gives two implementations that can disagree, which is what §5 exists to prevent. The alternative is for the backend to return tool-call requests, the frontend to execute them against `src/lib/`, and the frontend to re-post with the results — one implementation, at the cost of an extra round trip per tool call. The second is preferable, and the contract test established in this phase is the pattern for keeping that seam honest.
+2. **Golden-question suite.** ~30 questions checking that stated figures match the context and the tool results. Needs a real key, so it belongs in CI as an opt-in job rather than a required one. This is what turns prompt edits from guesswork into something testable.
 
-2. **Streaming.** Replace the blocking `postForObject` with SSE.
-3. **`update_profile`** so the advisor can fill gaps conversationally, writing into the wizard's sections, with a visible and undoable confirmation.
-4. **Persisted chat history**, multiple named conversations.
-5. **Golden-question suite.** `AdvisorPromptTest` pins the guardrails; extend it to ~30 questions checking that stated figures match the context. This needs a real API key, so it belongs in CI as an opt-in job rather than a required one.
+3. **Streaming.** Replace the blocking `postForObject` with SSE. Note this interacts with tool calling: a streamed response can carry tool-call deltas that have to be reassembled before the client can run anything.
 
-Phase 3 (the planning engine) depends on 1.
+4. **`update_profile`** so the advisor can fill gaps conversationally, writing into the wizard's sections. Unlike the current three, this one *writes*, so it needs a visible confirmation and an undo — which is why it was deliberately left out of the first tool set.
+
+5. **Persisted chat history**, multiple named conversations. Tool turns have to persist too, since the model needs them on the next request.
+
+Phase 3 (the planning engine) can start once 1 and 2 give confidence the tool loop behaves.
