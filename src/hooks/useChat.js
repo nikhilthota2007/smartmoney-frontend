@@ -101,7 +101,7 @@ export const useChat = (profile) => {
           ...previous,
           {
             role: 'assistant',
-            content: `Sorry, I encountered an error: ${error.message}. Please make sure the Java backend is running on port 8080.`,
+            content: `Sorry, I encountered an error: ${error.message}. Please try again in a moment.`,
           },
         ]);
       } finally {

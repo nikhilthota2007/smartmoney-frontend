@@ -9,7 +9,7 @@ An intelligent financial advisory application that provides personalized money-s
 ## Features
 
 - Guided five-step intake for income, expenses, debts, accounts and goals, with a completeness meter
-- AI-powered financial advice using Groq's LLaMA model
+- AI-powered financial advice from a Groq-hosted model, which calls the app's own financial logic rather than estimating figures
 - Financial health scoring, with coverage and retirement checks alongside it
 - Debt payoff calculator with multiple payment strategies, which warns when a minimum payment never covers the interest
 - Profile saved on your own device, with JSON export and import
@@ -23,7 +23,7 @@ An intelligent financial advisory application that provides personalized money-s
 - **Icons:** Lucide React
 - **Testing:** Jest + React Testing Library
 - **Hosting:** Vercel
-- **Backend Integration:** RESTful API
+- **API:** Node serverless functions in `api/`, deployed alongside the site
 
 ## Local Development
 
@@ -45,17 +45,23 @@ cd smartmoney-frontend
 npm install
 ```
 
-3. Create a `.env` file in the root directory:
+3. Run the site and its API together:
+```bash
+npx vercel dev
+```
+
+`vercel dev` serves the React app and the functions in `api/` from one origin,
+which is how they are deployed. It needs `GROQ_API_KEY` set — either in the
+linked Vercel project or in a local `.env` file.
+
+`npm start` runs the React dev server alone. It does not serve `api/`, so point
+it at a running backend instead:
+
 ```
 REACT_APP_API_URL=http://localhost:8080
 ```
 
-4. Start the development server:
-```bash
-npm start
-```
-
-5. Open your browser and navigate to `http://localhost:3000`
+4. Open your browser and navigate to `http://localhost:3000`
 
 ## Available Scripts
 
@@ -63,14 +69,35 @@ npm start
 |---|---|
 | `npm start` | Development server on port 3000 |
 | `npm test` | Jest in watch mode (`CI=true npm test` for a single run) |
-| `npm run lint` | ESLint over `src/` |
+| `npm run lint` | ESLint over `src/` and `api/` |
 | `npm run build` | Production build |
 
 ## Project Structure
 
-The application consists of a React frontend that communicates with a Java Spring Boot backend. User financial data is processed through the backend API, which interfaces with Groq's AI model to generate personalized financial advice.
+The site serves its own API. `api/` holds Node serverless functions that Vercel
+deploys next to the built React app, so a deployment is self-contained and the
+live link works with nothing else running.
+
+Those functions are a port of the Java service in
+[smartmoney-backend](https://github.com/nikhilthota2007/smartmoney-backend),
+which still builds and runs. Both send the same prompt: `api/_lib/prompts/` and
+`api/_lib/tools/` are byte-identical copies of the backend's resources, and the
+port was verified against the Java original before it replaced it. **Edit the
+prompt or the tool schemas in both places, or the two deployments will disagree
+about what the advisor is told.**
 
 ```
+api/                  Serverless API (CommonJS — see api/_lib/prompt.js)
+├── chat.js           POST /api/chat
+├── health.js         GET /api/health — model, prompt and tool versions, key presence
+└── _lib/             Underscore-prefixed, so Vercel does not route it
+    ├── advisor.js    The Groq call, message building, reply parsing
+    ├── prompt.js     Loads the versioned system prompt
+    ├── picture.js    Renders the computed figures the model reads
+    ├── tools.js      Loads the tool declarations
+    ├── prompts/      Versioned system prompts
+    └── tools/        Versioned tool schemas
+
 src/
 ├── components/       UI, grouped by feature
 │   ├── common/       Modal, currency field, dark-mode toggle
@@ -88,7 +115,7 @@ src/
 │   ├── profile.js    Profile schema, migrations and derived summary
 │   ├── profileFile.js JSON export and import
 │   ├── storage.js    localStorage persistence
-│   └── api.js        Backend client
+│   └── api.js        API client (same origin by default)
 └── styles/           CSS, imported in cascade order by index.css
 ```
 
@@ -105,9 +132,27 @@ See [`docs/PLAN.md`](docs/PLAN.md) for the full build plan. Phase 0 (foundation)
 Phase 1 (guided intake) are complete. Phase 2 makes the advisor call the financial
 logic as tools instead of doing its own arithmetic.
 
+## Deployment
+
+Vercel builds the React app and the `api/` functions from this one repository.
+Set `GROQ_API_KEY` in the project's environment variables; `GROQ_MODEL`
+optionally overrides the model.
+
+`GET /api/health` reports what a deployment is actually running:
+
+```
+Financial Advisor API is running! model=openai/gpt-oss-120b prompt=v4 tools=v1 key=configured [simulate_debt_payoff, evaluate_goal, project_savings]
+```
+
+That line is the first thing to check when the advisor reports itself
+unavailable — the chat endpoint deliberately returns one generic error for
+every upstream failure, so a retired model, a missing key and a rate limit look
+identical from the browser. Groq retires model names, and calling a retired one
+fails every request; `GROQ_MODEL` changes it without a code change.
+
 ## Related Repositories
 
-- [Backend API Repository](https://github.com/nikhilthota2007/smartmoney-backend)
+- [Backend API Repository](https://github.com/nikhilthota2007/smartmoney-backend) — the original Java service the `api/` functions were ported from
 
 ## Author
 

@@ -1,4 +1,13 @@
-const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+/**
+ * Empty means same origin: the advisor now ships as a serverless function in
+ * this repository (api/chat.js), so a deployed site answers its own API calls
+ * and needs no separately hosted backend.
+ *
+ * Set REACT_APP_API_URL to point at the Java service instead — that is what
+ * `npm start` against a local backend needs, since the CRA dev server does not
+ * serve the functions. `vercel dev` serves both and needs no override.
+ */
+const API_BASE = process.env.REACT_APP_API_URL ?? '';
 
 /**
  * Ask the advisor a question.
