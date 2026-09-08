@@ -7,7 +7,8 @@ const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8080';
  * keeps working; `financialContext` carries the computed picture a current
  * backend prefers.
  *
- * Resolves to the assistant's reply text; throws with a readable message.
+ * Resolves to `{ response, toolCalls }`: either an answer, or a request to run
+ * calculations here and send the results back. Throws with a readable message.
  */
 export const sendChatMessage = async ({ financialData, financialContext, message, history }) => {
   const response = await fetch(`${API_BASE}/api/chat`, {
@@ -24,5 +25,5 @@ export const sendChatMessage = async ({ financialData, financialContext, message
   if (!data.success) {
     throw new Error(data.error || 'Unknown error occurred');
   }
-  return data.response;
+  return { response: data.response, toolCalls: data.toolCalls || [] };
 };

@@ -7,7 +7,7 @@ import HealthScoreModal from '../dashboard/HealthScoreModal';
 import DebtCalculatorModal from '../planning/DebtCalculatorModal';
 
 const ChatWindow = ({ chat, onEditFinances }) => {
-  const { messages, input, setInput, loading, sendMessage, clearChat } = chat;
+  const { visible, input, setInput, loading, runningTool, sendMessage, clearChat } = chat;
   const [showHealthScore, setShowHealthScore] = useState(false);
   const [showCalculator, setShowCalculator] = useState(false);
   // Kept here so the figure survives closing and reopening the calculator.
@@ -51,9 +51,10 @@ const ChatWindow = ({ chat, onEditFinances }) => {
         </div>
 
         <MessageList
-          messages={messages}
+          messages={visible}
           loading={loading}
-          showExamples={messages.length === 1}
+          runningTool={runningTool}
+          showExamples={visible.length === 1}
           onExampleClick={setInput}
         />
 

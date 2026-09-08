@@ -350,3 +350,10 @@
   flex-shrink: 0;
 }
 
+
+/* Names the calculation running behind the spinner, so the pause is explained. */
+.running-tool {
+  margin-left: 10px;
+  font-size: 13px;
+  color: #6b7280;
+}

@@ -231,3 +231,7 @@ body.dark-mode .debt-warning strong {
 body.dark-mode .debt-warning p {
   color: #fecaca;
 }
+
+body.dark-mode .running-tool {
+  color: #9ca3af;
+}
