@@ -174,7 +174,34 @@ describe('system prompt', () => {
 
   it('keeps the guardrails that make the advice safe to ship', () => {
     expect(PROMPT_TEMPLATE).toContain('EDUCATIONAL INFORMATION, NOT LICENSED ADVICE');
-    expect(PROMPT_VERSION).toBe('v4');
+    expect(PROMPT_VERSION).toBe('v5');
+  });
+
+  /**
+   * v5. A live run against Groq produced both of these failures in one answer:
+   * a fabricated "roughly 2 months" for a gap that really takes 10 to 13, and
+   * "The tool can recalculate that" said straight to the user.
+   */
+  it('forbids working out a timeline in prose', () => {
+    expect(PROMPT_TEMPLATE).toContain('HOW LONG until a target is reached');
+    expect(PROMPT_TEMPLATE).toContain('how much is needed each month to reach a target by a date');
+    expect(PROMPT_TEMPLATE).toContain('is a timeline');
+  });
+
+  it('narrows what counts as simple arithmetic to one showable line', () => {
+    expect(PROMPT_TEMPLATE).toContain('SINGLE step you can show in');
+    expect(PROMPT_TEMPLATE).toContain('this licence does not cover it');
+  });
+
+  it('sends emergency-fund timelines to evaluate_goal', () => {
+    expect(PROMPT_TEMPLATE).toContain('An emergency-fund target is a goal like any other');
+    expect(PROMPT_TEMPLATE).toContain('how long until I have');
+  });
+
+  it('forbids referring to the tools at all, not merely naming them', () => {
+    expect(PROMPT_TEMPLATE).toContain('NEVER REFER TO THESE TOOLS IN YOUR ANSWER');
+    expect(PROMPT_TEMPLATE).toContain('"the tool"');
+    expect(PROMPT_TEMPLATE).toContain('tell me another amount and I will work');
   });
 });
 
