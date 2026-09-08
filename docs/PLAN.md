@@ -289,16 +289,40 @@ Add CI on PRs at Phase 0, not Phase 5.
 
 ## 12. Immediate next steps
 
-Phases 0 and 1 are complete. Phase 2 is part-done: the advisor is grounded, but cannot yet compute anything parameterized.
+Phases 0 and 1 are complete. Phase 2 is complete: the advisor is grounded in computed figures and calls tools for the parameterized questions the context cannot answer, now confirmed against a live model.
 
-1. **Run it against the real Groq API.** Everything so far is verified against mocks and a stub backend, because there is no API key in this environment. The wire format is asserted in `AdvisorServiceTest` and the loop was driven end to end in a browser against a stub, but no real model has yet chosen to call these tools. **This is the first thing to do, and it is the most likely place for a surprise** — whether the model calls tools when it should, whether it obeys the "never describe the tools" instruction, and whether `llama-3.3-70b-versatile` handles multi-tool rounds well.
+1. ✅ **Run it against the real Groq API.** Done. Asked what an extra $300/month would do, a real model called `simulate_debt_payoff` with `{"extraPayment":300}`, took the result back and answered from it — quoting the returned months and interest, and the surplus from the context, without inventing figures. The tool loop behaves as designed against a live model.
+
+   Two things this turned up, neither of them predicted here:
+
+   - **`llama-3.3-70b-versatile` no longer exists on Groq.** It returns `404 model_not_found` on every call, and the chat endpoint's single generic error made that indistinguishable from an outage. The model is now `openai/gpt-oss-120b`, `/api/health` names whichever model is configured, and a rejected upstream call logs the status and body Groq returned. A model name is not a stable dependency; treat it as configuration and make the running value observable.
+   - **The `max_tokens: 1000` budget truncates long answers mid-sentence.** Unchanged for now, since it is the value the advisor has always run with, but it is the next thing to look at: the answers this produces are longer than the limit allows.
 
 2. **Golden-question suite.** ~30 questions checking that stated figures match the context and the tool results. Needs a real key, so it belongs in CI as an opt-in job rather than a required one. This is what turns prompt edits from guesswork into something testable.
 
-3. **Streaming.** Replace the blocking `postForObject` with SSE. Note this interacts with tool calling: a streamed response can carry tool-call deltas that have to be reassembled before the client can run anything.
+3. **Streaming.** Replace the blocking upstream call with SSE. Note this interacts with tool calling: a streamed response can carry tool-call deltas that have to be reassembled before the client can run anything.
 
 4. **`update_profile`** so the advisor can fill gaps conversationally, writing into the wizard's sections. Unlike the current three, this one *writes*, so it needs a visible confirmation and an undo — which is why it was deliberately left out of the first tool set.
 
 5. **Persisted chat history**, multiple named conversations. Tool turns have to persist too, since the model needs them on the next request.
 
-Phase 3 (the planning engine) can start once 1 and 2 give confidence the tool loop behaves.
+Phase 3 (the planning engine) can start once 2 gives confidence the tool loop behaves across a range of questions; 1 confirmed it behaves on the case it was designed for.
+
+### The API moved into this repository
+
+The advisor now also runs as Node serverless functions in `api/`, deployed by
+Vercel alongside the built site, so the live link works without a separately
+hosted backend. They are a port of the Java service, which still builds and is
+tested and remains the reference implementation.
+
+The port was checked against the original rather than assumed equivalent: the
+rendered financial picture and the assembled message list were generated from
+both implementations over the shared contract fixture and a set of edge cases —
+absent figures, negative net worth, awkward decimals, a payoff that never
+clears, tool-call and tool-result turns — and compared. They matched exactly.
+
+The cost is a duplicated prompt and tool schema, one copy per repository. That
+duplication is the thing most likely to rot: **edit `api/_lib/prompts/` and
+`api/_lib/tools/` together with their backend originals.** A cross-repo test
+cannot see both, so what pins them is the contract each side asserts against the
+frontend's published `TOOL_MANIFEST`, plus that instruction.
