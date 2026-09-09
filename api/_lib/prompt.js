@@ -15,7 +15,7 @@
 const { readFileSync } = require('node:fs');
 const path = require('node:path');
 
-const PROMPT_VERSION = 'v5';
+const PROMPT_VERSION = 'v6';
 
 const PROMPT_FILE = path.join(__dirname, 'prompts', `advisor-system-prompt.${PROMPT_VERSION}.md`);
 const PICTURE_PLACEHOLDER = '{{financialPicture}}';

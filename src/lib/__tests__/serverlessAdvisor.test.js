@@ -174,7 +174,27 @@ describe('system prompt', () => {
 
   it('keeps the guardrails that make the advice safe to ship', () => {
     expect(PROMPT_TEMPLATE).toContain('EDUCATIONAL INFORMATION, NOT LICENSED ADVICE');
-    expect(PROMPT_VERSION).toBe('v5');
+    expect(PROMPT_VERSION).toBe('v6');
+  });
+
+  /**
+   * v6. A live answer to "should I finance a car" hit the token cap and was cut
+   * off mid-sentence, after two markdown tables the client cannot render and
+   * three section headers, before it reached a recommendation.
+   */
+  it('bans markdown tables, which the client cannot render', () => {
+    expect(PROMPT_TEMPLATE).toContain('NEVER USE MARKDOWN TABLES');
+    expect(PROMPT_TEMPLATE).toContain('paragraphs and bullet lists');
+  });
+
+  it('requires the answer first and keeps it short', () => {
+    expect(PROMPT_TEMPLATE).toContain('Lead with the answer');
+    expect(PROMPT_TEMPLATE).toContain('Keep it short');
+    expect(PROMPT_TEMPLATE).toContain('cut off mid-sentence');
+  });
+
+  it('stops it answering with a list of questions', () => {
+    expect(PROMPT_TEMPLATE).toContain('Ask at most two clarifying questions');
   });
 
   /**
@@ -343,6 +363,9 @@ describe('the upstream call', () => {
     expect(body.model).toBe(DEFAULT_MODEL);
     expect(body.tool_choice).toBe('auto');
     expect(body.tools).toEqual(TOOL_DECLARATIONS);
+    // A live answer was truncated mid-sentence at the old cap of 1000. The
+    // client shows whatever arrives, so a low cap fails silently.
+    expect(body.max_tokens).toBe(3000);
   });
 
   /**
