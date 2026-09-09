@@ -22,7 +22,7 @@ const DEFAULT_MODEL = 'openai/gpt-oss-120b';
 const modelName = () => process.env.GROQ_MODEL || DEFAULT_MODEL;
 
 const temperature = () => Number(process.env.GROQ_TEMPERATURE ?? 0.7);
-const maxTokens = () => Number(process.env.GROQ_MAX_TOKENS ?? 1000);
+const maxTokens = () => Number(process.env.GROQ_MAX_TOKENS ?? 3000);
 
 /** Without this a stalled Groq call runs until the platform kills the function. */
 const REQUEST_TIMEOUT_MS = () => Number(process.env.GROQ_TIMEOUT_MS ?? 60000);

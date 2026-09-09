@@ -159,7 +159,7 @@ describe('GET /api/health', () => {
     health({ method: 'GET' }, res);
 
     expect(res.body).toContain(`model=${DEFAULT_MODEL}`);
-    expect(res.body).toContain('prompt=v5');
+    expect(res.body).toContain('prompt=v6');
     expect(res.body).toContain('tools=v1');
     expect(res.body).toContain('simulate_debt_payoff');
     expect(res.body).toContain('evaluate_goal');
