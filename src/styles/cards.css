@@ -1,0 +1,257 @@
+/* Result cards: payoff, goal, projection, strategy, and the score dial. */
+
+.tool-card {
+  display: grid;
+  gap: var(--space-2);
+  width: 100%;
+  max-width: 440px;
+}
+
+.tool-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-1);
+  min-height: 28px;
+}
+
+.tool-card-head .eyebrow {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tool-card-hero {
+  display: grid;
+  gap: 6px;
+}
+
+.tool-card-label {
+  font-size: var(--text-small);
+  color: var(--color-muted);
+}
+
+/* Two headline stats side by side. */
+.stat-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-1);
+}
+
+.stat {
+  display: grid;
+  gap: 2px;
+  padding: var(--space-1-5);
+  border-radius: var(--radius-input);
+  background: var(--color-surface);
+}
+
+.stat-value {
+  font-size: var(--text-heading);
+  font-weight: var(--weight-light);
+  line-height: 1.1;
+}
+
+.stat-label {
+  font-size: var(--text-xs);
+  color: var(--color-muted);
+}
+
+/* Payoff timelines. */
+.timeline-compare {
+  display: grid;
+  gap: var(--space-1-5);
+}
+
+.timeline {
+  display: grid;
+  gap: 6px;
+}
+
+.timeline-head {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-1);
+  font-size: var(--text-xs);
+  color: var(--color-muted);
+}
+
+.timeline-head > :last-child {
+  color: var(--color-text);
+  font-weight: var(--weight-medium);
+}
+
+/* Bars draw in from the left when a card appears. */
+.bar-grow {
+  transform-origin: left center;
+  animation: bar-grow 900ms var(--ease-soft) 150ms both;
+}
+
+@keyframes bar-grow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Goal card. */
+.goal-progress {
+  display: grid;
+  gap: 6px;
+}
+
+.goal-progress-label {
+  font-size: var(--text-xs);
+  color: var(--color-muted);
+}
+
+/* Projection card: a stacked bar of what the balance is made of. */
+.stack-bar {
+  display: flex;
+  gap: 3px;
+  height: 10px;
+}
+
+.stack-bar-part {
+  flex-basis: 0;
+  min-width: 6px;
+  border-radius: var(--radius-pill);
+  transform-origin: left center;
+  animation: bar-grow 900ms var(--ease-soft) 150ms both;
+}
+
+.stack-start {
+  background: var(--color-faint);
+}
+
+.stack-added {
+  background: var(--color-primary);
+}
+
+.stack-growth {
+  background: var(--color-accent);
+}
+
+.stack-legend {
+  display: grid;
+  gap: 6px;
+  list-style: none;
+  font-size: var(--text-small);
+}
+
+.stack-legend li {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.stack-legend li > :nth-child(2) {
+  color: var(--color-muted);
+}
+
+.stack-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-pill);
+  animation: none;
+}
+
+.projection-card .card-foot {
+  align-items: flex-start;
+  line-height: 1.4;
+}
+
+.projection-card .card-foot svg {
+  margin-top: 2px;
+  flex: none;
+}
+
+/* Strategy cards (debt calculator, landing). */
+.strategy-card {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+}
+
+.strategy-title {
+  font-size: var(--text-heading);
+  font-weight: var(--weight-regular);
+  line-height: 1.2;
+}
+
+.strategy-desc {
+  margin-top: 2px;
+  font-size: var(--text-small);
+  color: var(--color-muted);
+}
+
+.strategy-time {
+  font-size: var(--text-figure);
+}
+
+.strategy-recommended {
+  box-shadow: inset 0 0 0 1.5px var(--color-accent), var(--shadow-card);
+}
+
+.card-row-strong > :first-child {
+  color: var(--color-text);
+}
+
+.card-row-strong > :last-child {
+  font-weight: var(--weight-semibold);
+}
+
+/* Score dial. */
+.score-dial {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+
+.score-dial svg {
+  position: absolute;
+  inset: 0;
+}
+
+.score-dial-track {
+  fill: none;
+  stroke: var(--color-sunken);
+}
+
+.score-dial-fill {
+  fill: none;
+  stroke: var(--dial-tone);
+  stroke-linecap: round;
+  transition: stroke-dasharray var(--dur-reveal) var(--ease-reveal);
+}
+
+.score-dial-center {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+}
+
+.score-dial-number {
+  font-size: var(--text-figure-lg);
+  font-weight: var(--weight-light);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.score-dial-label {
+  font-size: var(--text-xs);
+  color: var(--color-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar-grow,
+  .stack-bar-part {
+    animation: none;
+  }
+}

@@ -82,7 +82,7 @@ const DebtCalculatorModal = ({ onClose, extraPayment, onExtraPaymentChange }) =>
             <div className="strategies-grid-three">
               <StrategyCard
                 variant="avalanche"
-                badge="💰 Best for Savings"
+                badge="Least interest"
                 title="Debt Avalanche"
                 description="Highest interest rate first"
                 result={current.avalanche}
@@ -90,7 +90,7 @@ const DebtCalculatorModal = ({ onClose, extraPayment, onExtraPaymentChange }) =>
               />
               <StrategyCard
                 variant="snowball"
-                badge="🎯 Best for Motivation"
+                badge="Quickest wins"
                 title="Debt Snowball"
                 description="Smallest balance first"
                 result={current.snowball}
@@ -101,7 +101,7 @@ const DebtCalculatorModal = ({ onClose, extraPayment, onExtraPaymentChange }) =>
               />
               <StrategyCard
                 variant="recommended"
-                badge="💡 Recommended"
+                badge="Recommended"
                 title="Smart Payment Plan"
                 description={`Recommended extra payment of $${results.recommendedExtra}/mo`}
                 result={recommended.avalanche}
