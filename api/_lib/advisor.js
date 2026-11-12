@@ -175,8 +175,35 @@ const getChatResponse = async (request, options = {}) => {
   return extractReply(await response.json());
 };
 
+/**
+ * A JSON-only answer from the deployment's Groq model (used to sort
+ * transactions when the user has not pasted a Gemini key).
+ */
+const getJsonResponse = async ({ system, prompt }, options = {}) => {
+  const fetchImpl = options.fetchImpl || ((...args) => fetch(...args));
+  const apiKey = process.env.GROQ_API_KEY;
+  if (!apiKey) throw new Error('GROQ_API_KEY is not set on this deployment');
+
+  const response = await fetchImpl(GROQ_API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+    body: JSON.stringify({
+      model: modelName(),
+      messages: [textMessage('system', system), textMessage('user', prompt)],
+      temperature: 0,
+      max_tokens: maxTokens(),
+      response_format: { type: 'json_object' },
+    }),
+    signal: timeoutSignal(REQUEST_TIMEOUT_MS()),
+  });
+  if (!response.ok) throw new GroqError(response.status, await response.text());
+  const { content } = extractReply(await response.json());
+  return JSON.parse(content);
+};
+
 module.exports = {
   DEFAULT_MODEL,
+  getJsonResponse,
   GroqError,
   buildMessages,
   extractReply,

@@ -13,7 +13,7 @@
   ],
   "headers": [
     {
-      "source": "/(.*)\\.mjs",
+      "source": "/pdf.worker.min.mjs",
       "headers": [
         {
           "key": "Content-Type",

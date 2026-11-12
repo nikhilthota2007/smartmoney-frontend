@@ -7,6 +7,8 @@
  * `npm start` against a local backend needs, since the CRA dev server does not
  * serve the functions. `vercel dev` serves both and needs no override.
  */
+import { aiHeaders } from './aiKey';
+
 const API_BASE = process.env.REACT_APP_API_URL ?? '';
 
 /**
@@ -22,7 +24,8 @@ const API_BASE = process.env.REACT_APP_API_URL ?? '';
 export const sendChatMessage = async ({ financialData, financialContext, message, history }) => {
   const response = await fetch(`${API_BASE}/api/chat`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    // The user's own Gemini key rides along when they have pasted one.
+    headers: { 'Content-Type': 'application/json', ...aiHeaders() },
     body: JSON.stringify({ financialData, financialContext, message, history }),
   });
 
@@ -35,4 +38,35 @@ export const sendChatMessage = async ({ financialData, financialContext, message
     throw new Error(data.error || 'Unknown error occurred');
   }
   return { response: data.response, toolCalls: data.toolCalls || [] };
+};
+
+/**
+ * Sort statement transactions the device could not. `items` are already
+ * redacted: { id, description, amount }. Resolves to { [id]: category }.
+ */
+export const categorizeTransactions = async (items) => {
+  const response = await fetch(`${API_BASE}/api/statement`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...aiHeaders() },
+    body: JSON.stringify({ items }),
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || !data.success) {
+    throw new Error(data.error || "Couldn't sort those transactions right now.");
+  }
+  return data.categories;
+};
+
+/** Check a pasted Gemini key. Resolves to { valid, model } or { valid: false, error }. */
+export const checkGeminiKey = async (key) => {
+  try {
+    const response = await fetch(`${API_BASE}/api/key`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Gemini-Key': key.trim() },
+      body: '{}',
+    });
+    return await response.json();
+  } catch {
+    return { valid: false, error: "Couldn't reach SmartMoney to check the key. Try again in a moment." };
+  }
 };

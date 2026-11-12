@@ -7,8 +7,14 @@
  *
  * Same request and response shapes as the Spring backend, so src/lib/api.js is
  * unchanged and either can serve the app.
+ *
+ * With an X-Gemini-Key header (the user's own key, pasted in Settings) the
+ * turn runs on Gemini instead of the deployment's Groq key. Same prompt, same
+ * tools; the key is used for this request only.
  */
 const { GroqError, getChatResponse } = require('./_lib/advisor.js');
+const { GeminiError, getGeminiChatResponse } = require('./_lib/gemini.js');
+const { geminiFromRequest, userKeyMessage } = require('./_lib/userKey.js');
 
 /** What the client is told when the upstream call fails. Details stay in the logs. */
 const GENERIC_ERROR = 'The advisor is temporarily unavailable. Please try again in a moment.';
@@ -27,7 +33,8 @@ module.exports = async function handler(req, res) {
 
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {};
-    const reply = await getChatResponse(body);
+    const gemini = geminiFromRequest(req);
+    const reply = gemini ? await getGeminiChatResponse(body, gemini) : await getChatResponse(body);
 
     const response = { response: reply.content, success: true };
     if (reply.toolCalls.length > 0) {
@@ -36,6 +43,13 @@ module.exports = async function handler(req, res) {
     }
     return res.status(200).json(response);
   } catch (error) {
+    if (error instanceof GeminiError) {
+      // The user's own key: say what went wrong when it is theirs to fix.
+      console.error('Gemini rejected the request', { status: error.status });
+      const message = userKeyMessage(error.status);
+      if (message) return res.status(200).json({ response: null, success: false, error: message });
+      return failure(res);
+    }
     if (error instanceof GroqError) {
       // Groq's body says why — a retired model, a bad key, a rate limit — and
       // that distinction is invisible from the browser, which sees the same
