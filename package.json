@@ -10,6 +10,7 @@
     "@testing-library/user-event": "^13.5.0",
     "animejs": "^4.5.0",
     "lucide-react": "^0.562.0",
+    "pdfjs-dist": "^6.5.438",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-router-dom": "^6.30.6",
@@ -17,7 +18,9 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "prestart": "node scripts/copy-pdf-worker.js",
     "start": "react-scripts start",
+    "prebuild": "node scripts/copy-pdf-worker.js",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
