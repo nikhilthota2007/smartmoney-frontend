@@ -20,16 +20,16 @@
 .completeness-percent {
   font-weight: 700;
   font-size: 14px;
-  color: #374151;
+  color: var(--color-text);
 }
 
 .completeness-hint {
   font-size: 13px;
-  color: #6b7280;
+  color: var(--color-muted);
 }
 
 .completeness-fill {
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  background: var(--color-primary);
 }
 
 .completeness-sections {
@@ -46,11 +46,11 @@
   align-items: center;
   gap: 4px;
   font-size: 12px;
-  color: #9ca3af;
+  color: var(--color-muted);
 }
 
 .completeness-sections .section-done {
-  color: #10b981;
+  color: var(--color-success);
   font-weight: 600;
 }
 
@@ -64,10 +64,10 @@
 .wizard-step-tab {
   flex: 1 1 auto;
   padding: 8px 12px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-line-strong);
   border-radius: 8px;
-  background: white;
-  color: #6b7280;
+  background: var(--color-raised);
+  color: var(--color-muted);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -75,19 +75,19 @@
 }
 
 .wizard-step-tab:hover {
-  border-color: #667eea;
-  color: #667eea;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .wizard-step-tab.is-current {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--color-primary);
   border-color: transparent;
-  color: white;
+  color: var(--color-on-primary);
 }
 
 .wizard-subtitle {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--color-muted);
   margin: -8px 0 18px;
   line-height: 1.5;
 }
@@ -99,13 +99,13 @@
 .wizard-list-heading {
   font-size: 14px;
   font-weight: 700;
-  color: #374151;
+  color: var(--color-text);
   margin-bottom: 10px;
 }
 
 .list-editor-empty {
   font-size: 13px;
-  color: #9ca3af;
+  color: var(--color-muted);
   padding: 12px 0;
 }
 
@@ -115,8 +115,8 @@
   gap: 10px;
   padding: 12px;
   margin-bottom: 10px;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
+  background: var(--color-surface);
+  border: 1px solid var(--color-line-strong);
   border-radius: 10px;
 }
 
@@ -128,8 +128,8 @@
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: #667eea;
-  color: white;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
   font-size: 12px;
   font-weight: 700;
 }
@@ -155,30 +155,30 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  color: #9ca3af;
+  color: var(--color-muted);
   margin-bottom: 4px;
 }
 
 .list-editor-input-group {
   display: flex;
   align-items: center;
-  background: white;
-  border: 2px solid #e5e7eb;
+  background: var(--color-raised);
+  border: 2px solid var(--color-line-strong);
   border-radius: 8px;
   overflow: hidden;
 }
 
 .list-editor-input-group:focus-within {
-  border-color: #667eea;
+  border-color: var(--color-primary);
 }
 
 .list-editor-input {
   width: 100%;
   padding: 8px 10px;
   border: none;
-  background: white;
+  background: var(--color-raised);
   font-size: 14px;
-  color: #1f2937;
+  color: var(--color-text);
   font-family: inherit;
 }
 
@@ -187,7 +187,7 @@
 }
 
 select.list-editor-input {
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--color-line-strong);
   border-radius: 8px;
   padding: 8px;
   cursor: pointer;
@@ -195,7 +195,7 @@ select.list-editor-input {
 }
 
 select.list-editor-input:focus {
-  border-color: #667eea;
+  border-color: var(--color-primary);
 }
 
 /* .input-prefix/.input-suffix are absolutely positioned for the debt calculator.
@@ -205,9 +205,9 @@ select.list-editor-input:focus {
 .list-editor-input-group .input-suffix {
   position: static;
   padding: 0 8px;
-  color: #9ca3af;
+  color: var(--color-muted);
   font-size: 14px;
-  background: white;
+  background: var(--color-raised);
 }
 
 /* Consistent with the rest of the app: no spinner arrows on number inputs. */
@@ -247,7 +247,7 @@ select.list-editor-input:focus {
   padding: 8px 10px;
   border: none;
   background: none;
-  color: #667eea;
+  color: var(--color-primary);
   font-size: 13px;
   font-weight: 600;
   font-family: inherit;
@@ -256,18 +256,18 @@ select.list-editor-input:focus {
 }
 
 .text-btn:hover:not(:disabled) {
-  background: rgba(102, 126, 234, 0.08);
+  background: var(--color-shadow);
 }
 
 .text-btn:disabled {
-  color: #d1d5db;
+  color: var(--color-line-strong);
   cursor: not-allowed;
 }
 
 .wizard-skip-all {
   display: block;
   margin: 12px auto 0;
-  color: #9ca3af;
+  color: var(--color-muted);
 }
 
 .profile-file-controls {
@@ -277,13 +277,13 @@ select.list-editor-input:focus {
   flex-wrap: wrap;
   margin-top: 20px;
   padding-top: 16px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--color-line-strong);
 }
 
 .import-error {
   flex-basis: 100%;
   font-size: 13px;
-  color: #ef4444;
+  color: var(--color-danger);
 }
 
 .visually-hidden {

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import '@fontsource-variable/hanken-grotesk';
 import './index.css';
 import { ProfileProvider, useProfile } from './context/ProfileContext';
 import { ThemeProvider } from './context/ThemeContext';

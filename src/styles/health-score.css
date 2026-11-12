@@ -7,11 +7,11 @@
   align-items: center;
   gap: 12px;
   margin-bottom: 24px;
-  color: #1a202c;
+  color: var(--color-text);
 }
 
 .health-header svg {
-  color: #667eea;
+  color: var(--color-primary);
 }
 
 .health-header h2 {
@@ -30,7 +30,7 @@
   align-items: center;
   justify-content: center;
   margin: 0 auto 20px;
-  background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+  background: var(--color-surface);
 }
 
 .score-number {
@@ -41,7 +41,7 @@
 
 .score-label {
   font-size: 13px;
-  color: #718096;
+  color: var(--color-muted);
   margin-top: 4px;
 }
 
@@ -61,8 +61,8 @@
 }
 
 .encouragement-message {
-  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-  border-left: 4px solid #3b82f6;
+  background: var(--color-surface);
+  border-left: 4px solid var(--color-primary);
   padding: 16px 18px;
   border-radius: 10px;
   margin-bottom: 24px;
@@ -70,7 +70,7 @@
 
 .encouragement-message p {
   margin: 0;
-  color: #1e40af;
+  color: var(--color-primary);
   font-size: 14px;
   line-height: 1.6;
   font-weight: 500;
@@ -94,18 +94,18 @@
 .breakdown-label {
   font-size: 14px;
   font-weight: 600;
-  color: #4a5568;
+  color: var(--color-muted);
 }
 
 .breakdown-score {
   font-size: 14px;
   font-weight: 700;
-  color: #1a202c;
+  color: var(--color-text);
 }
 
 .progress-bar {
   height: 8px;
-  background: #e2e8f0;
+  background: var(--color-line-strong);
   border-radius: 10px;
   overflow: hidden;
   margin-bottom: 6px;
@@ -119,19 +119,19 @@
 
 .breakdown-detail {
   font-size: 12px;
-  color: #718096;
+  color: var(--color-muted);
 }
 
 .improvement-tips {
   margin-top: 28px;
   padding-top: 24px;
-  border-top: 2px solid #e2e8f0;
+  border-top: 2px solid var(--color-line-strong);
 }
 
 .improvement-tips h3 {
   font-size: 15px;
   font-weight: 700;
-  color: #1a202c;
+  color: var(--color-text);
   margin-bottom: 12px;
 }
 
@@ -141,11 +141,11 @@
   margin-bottom: 10px;
   font-size: 13px;
   line-height: 1.6;
-  color: #4a5568;
+  color: var(--color-muted);
 }
 
 .tip-bullet {
-  color: #667eea;
+  color: var(--color-primary);
   font-weight: bold;
   flex-shrink: 0;
 }
@@ -153,7 +153,7 @@
 .no-score {
   text-align: center;
   padding: 60px 20px;
-  color: #718096;
+  color: var(--color-muted);
   font-size: 15px;
 }
 

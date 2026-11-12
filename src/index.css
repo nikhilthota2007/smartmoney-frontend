@@ -1,10 +1,13 @@
 /**
  * Stylesheet entry point.
  *
- * Import order is the cascade order — keep it. Files are grouped by the
- * component tree in src/components/.
+ * Import order is the cascade order: tokens, then document defaults, then
+ * shared primitives, then one file per screen. Only tokens.css may contain a
+ * colour literal.
  */
+@import './styles/tokens.css';
 @import './styles/base.css';
+@import './styles/primitives.css';
 @import './styles/layout.css';
 @import './styles/intake.css';
 @import './styles/chat.css';
@@ -13,4 +16,3 @@
 @import './styles/debt-calculator.css';
 @import './styles/wizard.css';
 @import './styles/status.css';
-@import './styles/theme.css';

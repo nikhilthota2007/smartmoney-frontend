@@ -6,7 +6,7 @@
 .icon-circle {
   width: 80px;
   height: 80px;
-  background: #667eea;
+  background: var(--color-primary);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -15,20 +15,20 @@
 }
 
 .icon-circle svg {
-  color: white;
+  color: var(--color-on-primary);
   width: 40px;
   height: 40px;
 }
 
 h1 {
-  color: #1a202c;
+  color: var(--color-text);
   font-size: 36px;
   margin-bottom: 10px;
   font-weight: 700;
 }
 
 .subtitle {
-  color: #718096;
+  color: var(--color-muted);
   font-size: 16px;
   margin-bottom: 15px;
   line-height: 1.5;
@@ -38,8 +38,8 @@ h1 {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
   padding: 8px 16px;
   border-radius: 20px;
   font-size: 13px;
@@ -61,14 +61,14 @@ h1 {
   gap: 10px;
   margin: 30px 0 20px;
   padding-top: 30px;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--color-line-strong);
   font-size: 18px;
   font-weight: 600;
-  color: #1a202c;
+  color: var(--color-text);
 }
 
 .section-header svg {
-  color: #667eea;
+  color: var(--color-primary);
 }
 
 .form-group {
@@ -79,7 +79,7 @@ h1 {
   display: block;
   font-size: 14px;
   font-weight: 500;
-  color: #4a5568;
+  color: var(--color-muted);
   margin-bottom: 8px;
 }
 
@@ -92,7 +92,7 @@ h1 {
   left: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: #a0aec0;
+  color: var(--color-faint);
   font-size: 16px;
 }
 
@@ -100,7 +100,7 @@ input[type="number"],
 textarea {
   width: 100%;
   padding: 12px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--color-line-strong);
   border-radius: 8px;
   font-size: 16px;
   transition: all 0.3s;
@@ -113,8 +113,8 @@ input[type="number"] {
 input:focus,
 textarea:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-shadow);
 }
 
 textarea {
@@ -125,8 +125,8 @@ textarea {
 .submit-btn {
   width: 100%;
   padding: 16px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
   border: none;
   border-radius: 8px;
   font-size: 16px;
@@ -138,13 +138,13 @@ textarea {
 
 .submit-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 25px var(--color-shadow);
 }
 
 .disclaimer-inline {
   text-align: center;
   font-size: 13px;
-  color: #718096;
+  color: var(--color-muted);
   line-height: 1.5;
   padding: 0 10px;
 }

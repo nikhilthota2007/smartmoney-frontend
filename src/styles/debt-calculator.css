@@ -3,8 +3,8 @@
   right: 40px;
   top: 50%;
   transform: translateY(-50%);
-  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-  color: white;
+  background: var(--color-accent);
+  color: var(--color-on-primary);
   border: none;
   border-radius: 16px;
   padding: 20px 24px;
@@ -13,7 +13,7 @@
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+  box-shadow: 0 8px 24px var(--color-shadow);
   transition: all 0.3s;
   z-index: 100;
   min-width: 120px;
@@ -21,8 +21,8 @@
 
 .calculator-btn:hover {
   transform: translateY(-50%) scale(1.05);
-  box-shadow: 0 12px 32px rgba(139, 92, 246, 0.5);
-  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  box-shadow: 0 12px 32px var(--color-shadow);
+  background: var(--color-accent);
 }
 
 .calculator-btn svg {
@@ -50,11 +50,11 @@
   align-items: center;
   gap: 12px;
   margin-bottom: 28px;
-  color: #1a202c;
+  color: var(--color-text);
 }
 
 .calculator-header svg {
-  color: #8b5cf6;
+  color: var(--color-accent);
 }
 
 .calculator-header h2 {
@@ -77,7 +77,7 @@
 .debts-list-header h3 {
   font-size: 16px;
   font-weight: 700;
-  color: #1a202c;
+  color: var(--color-text);
   margin: 0;
 }
 
@@ -85,8 +85,8 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  background: #10b981;
-  color: white;
+  background: var(--color-success);
+  color: var(--color-on-primary);
   border: none;
   padding: 8px 16px;
   border-radius: 8px;
@@ -97,7 +97,7 @@
 }
 
 .add-debt-btn:hover {
-  background: #059669;
+  background: var(--color-success);
   transform: translateY(-1px);
 }
 
@@ -108,16 +108,16 @@
   align-items: center;
   margin-bottom: 12px;
   padding: 12px;
-  background: #f7fafc;
+  background: var(--color-surface);
   border-radius: 10px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--color-line-strong);
 }
 
 .debt-row-number {
   width: 26px;
   height: 26px;
-  background: #667eea;
-  color: white;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -129,7 +129,7 @@
 .debt-input {
   width: 100%;
   padding: 8px 10px;
-  border: 1px solid #cbd5e0;
+  border: 1px solid var(--color-line-strong);
   border-radius: 6px;
   font-size: 14px;
 }
@@ -147,7 +147,7 @@
 .input-prefix {
   position: absolute;
   left: 10px;
-  color: #718096;
+  color: var(--color-muted);
   font-size: 14px;
   pointer-events: none;
 }
@@ -155,7 +155,7 @@
 .input-suffix {
   position: absolute;
   right: 10px;
-  color: #718096;
+  color: var(--color-muted);
   font-size: 14px;
   pointer-events: none;
 }
@@ -172,8 +172,8 @@
 .remove-debt-btn {
   width: 32px;
   height: 32px;
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
   border: none;
   border-radius: 6px;
   display: flex;
@@ -184,7 +184,7 @@
 }
 
 .remove-debt-btn:hover:not(:disabled) {
-  background: #fecaca;
+  background: var(--color-danger-soft);
   transform: scale(1.05);
 }
 
@@ -196,16 +196,16 @@
 .extra-payment-section-single {
   margin-bottom: 20px;
   padding: 20px;
-  background: #eff6ff;
+  background: var(--color-surface);
   border-radius: 12px;
-  border: 2px solid #3b82f6;
+  border: 2px solid var(--color-primary);
 }
 
 .extra-payment-section-single label {
   display: block;
   font-size: 14px;
   font-weight: 600;
-  color: #1e40af;
+  color: var(--color-primary);
   margin-bottom: 10px;
 }
 
@@ -213,10 +213,10 @@
   display: flex;
   justify-content: space-around;
   padding: 20px;
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  background: var(--color-success-soft);
   border-radius: 12px;
   margin-bottom: 28px;
-  border: 2px solid #10b981;
+  border: 2px solid var(--color-success);
 }
 
 .summary-item {
@@ -226,7 +226,7 @@
 .summary-label {
   display: block;
   font-size: 13px;
-  color: #065f46;
+  color: var(--color-success);
   font-weight: 600;
   margin-bottom: 6px;
 }
@@ -235,13 +235,13 @@
   display: block;
   font-size: 24px;
   font-weight: 800;
-  color: #10b981;
+  color: var(--color-success);
 }
 
 .calculator-prompt {
   text-align: center;
   padding: 40px 20px;
-  color: #718096;
+  color: var(--color-muted);
   font-size: 15px;
 }
 
@@ -253,7 +253,7 @@
 }
 
 .strategy-card-full {
-  background: #f7fafc;
+  background: var(--color-surface);
   border-radius: 14px;
   padding: 24px;
   border: 3px solid;
@@ -261,11 +261,11 @@
 }
 
 .strategy-card-full.strategy-avalanche {
-  border-color: #10b981;
+  border-color: var(--color-success);
 }
 
 .strategy-card-full.strategy-snowball {
-  border-color: #3b82f6;
+  border-color: var(--color-primary);
 }
 
 .strategy-card-full .strategy-badge {
@@ -273,36 +273,36 @@
   top: -12px;
   left: 50%;
   transform: translateX(-50%);
-  background: white;
+  background: var(--color-raised);
   padding: 4px 12px;
   border-radius: 12px;
   font-size: 11px;
   font-weight: 700;
   white-space: nowrap;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px var(--color-shadow);
 }
 
 .strategy-avalanche .strategy-badge {
-  color: #10b981;
-  border: 2px solid #10b981;
+  color: var(--color-success);
+  border: 2px solid var(--color-success);
 }
 
 .strategy-snowball .strategy-badge {
-  color: #3b82f6;
-  border: 2px solid #3b82f6;
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
 }
 
 .strategy-card-full h3 {
   font-size: 18px;
   font-weight: 700;
   margin-bottom: 4px;
-  color: #1a202c;
+  color: var(--color-text);
   margin-top: 8px;
 }
 
 .strategy-card-full .strategy-desc {
   font-size: 12px;
-  color: #718096;
+  color: var(--color-muted);
   margin-bottom: 16px;
 }
 
@@ -313,7 +313,7 @@
 .strategy-card-full .strategy-time {
   font-size: 28px;
   font-weight: 800;
-  color: #1a202c;
+  color: var(--color-text);
   line-height: 1.2;
 }
 
@@ -326,18 +326,18 @@
   justify-content: space-between;
   margin-bottom: 10px;
   font-size: 13px;
-  color: #4a5568;
+  color: var(--color-muted);
 }
 
 .strategy-row.highlight {
   font-weight: 700;
-  color: #1a202c;
+  color: var(--color-text);
   font-size: 14px;
 }
 
 .timeline-chart {
   height: 10px;
-  background: #e2e8f0;
+  background: var(--color-line-strong);
   border-radius: 10px;
   overflow: hidden;
 }
@@ -349,11 +349,11 @@
 }
 
 .timeline-avalanche {
-  background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
+  background: var(--color-success);
 }
 
 .timeline-snowball {
-  background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
+  background: var(--color-primary);
 }
 
 @media (max-width: 900px) {
@@ -401,16 +401,16 @@
 }
 
 .strategy-card-full.strategy-recommended {
-  border-color: #f59e0b;
+  border-color: var(--color-warning);
 }
 
 .strategy-recommended .strategy-badge {
-  color: #f59e0b;
-  border: 2px solid #f59e0b;
+  color: var(--color-warning);
+  border: 2px solid var(--color-warning);
 }
 
 .timeline-recommended {
-  background: linear-gradient(90deg, #f59e0b 0%, #fbbf24 100%);
+  background: var(--color-warning);
 }
 
 @media (max-width: 1300px) {

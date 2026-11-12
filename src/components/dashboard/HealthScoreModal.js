@@ -7,10 +7,19 @@ import { calculateHealthScore, getScoreRating, getImprovementTips } from '../../
 import { getProtectionChecks } from '../../lib/protection';
 import { useProfile } from '../../context/ProfileContext';
 
+/** The library's rating colours are hex values; the UI uses theme tokens instead. */
+const RATING_TONE = {
+  Excellent: 'var(--color-success)',
+  Good: 'var(--color-primary)',
+  Fair: 'var(--color-warning)',
+  'Needs Improvement': 'var(--color-danger)',
+};
+
 const HealthScoreModal = ({ onClose }) => {
   const { profile, financialData } = useProfile();
   const healthScore = calculateHealthScore(financialData);
-  const scoreRating = healthScore ? getScoreRating(healthScore.total) : null;
+  const rating = healthScore ? getScoreRating(healthScore.total) : null;
+  const scoreRating = rating && { ...rating, color: RATING_TONE[rating.rating] };
   const improvementTips = healthScore ? getImprovementTips(healthScore) : [];
   const protectionChecks = getProtectionChecks(profile);
 
