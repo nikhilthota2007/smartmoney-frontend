@@ -76,7 +76,9 @@ const ChatWindow = ({ chat, onEditFinances }) => {
         <ChatInput value={input} onChange={setInput} onSend={() => sendMessage()} loading={loading} inputRef={inputRef} />
       </main>
 
-      {showHealthScore && <HealthScoreModal onClose={() => setShowHealthScore(false)} />}
+      {showHealthScore && (
+        <HealthScoreModal onClose={() => setShowHealthScore(false)} onAddFigures={onEditFinances} />
+      )}
 
       {showCalculator && (
         <DebtCalculatorModal

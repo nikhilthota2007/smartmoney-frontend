@@ -1,22 +1,19 @@
 import React from 'react';
 
-/** One weighted component of the health score, with its progress bar. */
+/** One weighted component of the health score, with its bar. */
 const ScoreBreakdown = ({ label, detail, component, color }) => (
-  <div className="breakdown-item">
-    <div className="breakdown-header">
+  <div className="breakdown">
+    <div className="breakdown-head">
       <span className="breakdown-label">{label}</span>
-      <span className="breakdown-score">
+      <span className="breakdown-score tabular">
         {component.score}/{component.max}
       </span>
     </div>
-    <div className="progress-bar">
+    <div className="bar" aria-hidden="true">
       <div
-        className="progress-fill"
-        style={{
-          width: `${(component.score / component.max) * 100}%`,
-          backgroundColor: color,
-        }}
-      ></div>
+        className="bar-fill bar-grow"
+        style={{ width: `${(component.score / component.max) * 100}%`, background: color }}
+      />
     </div>
     <div className="breakdown-detail">{detail}</div>
   </div>

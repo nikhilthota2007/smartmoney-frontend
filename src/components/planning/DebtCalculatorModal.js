@@ -1,6 +1,6 @@
 import React from 'react';
 import { Calculator, Plus } from 'lucide-react';
-import Modal from '../common/Modal';
+import Sheet from '../common/Sheet';
 import DebtRow from './DebtRow';
 import StrategyCard from './StrategyCard';
 import DebtWarnings from './DebtWarnings';
@@ -21,18 +21,26 @@ const DebtCalculatorModal = ({ onClose, extraPayment, onExtraPaymentChange }) =>
   const unpayable = findUnpayableDebts(debts);
 
   return (
-    <Modal onClose={onClose} wide>
-      <div className="calculator-card">
-        <div className="calculator-header">
-          <Calculator size={24} />
-          <h2>Debt Payoff Calculator</h2>
-        </div>
+    <Sheet onClose={onClose} labelledBy="calculator-title" wide>
+      <header className="sheet-head">
+        <span className="eyebrow">
+          <Calculator size={14} aria-hidden="true" />
+          Debt payoff
+        </span>
+        <h2 className="sheet-title" id="calculator-title">
+          Debt Payoff Calculator
+        </h2>
+        <p className="sheet-lede">The same list as My Finances. Change it here and it changes there.</p>
+      </header>
 
-        <div className="debts-list">
-          <div className="debts-list-header">
-            <h3>Your Debts</h3>
-            <button className="add-debt-btn" onClick={addDebt}>
-              <Plus size={16} />
+      <div className="sheet-body">
+        <section className="calc-debts" aria-labelledby="debts-heading">
+          <div className="calc-debts-head">
+            <h3 className="sheet-section-title" id="debts-heading">
+              Your debts
+            </h3>
+            <button className="add-row" onClick={addDebt}>
+              <Plus size={16} aria-hidden="true" />
               Add Debt
             </button>
           </div>
@@ -47,39 +55,43 @@ const DebtCalculatorModal = ({ onClose, extraPayment, onExtraPaymentChange }) =>
               canRemove={debts.length > 1}
             />
           ))}
-        </div>
+        </section>
 
         <DebtWarnings unpayable={unpayable} hitsHorizon={hitsPayoffHorizon(current?.avalanche)} />
 
         {results ? (
           <>
-            <div className="extra-payment-section-single">
-              <label htmlFor="extra-payment">Extra Monthly Payment (Applied to Target Debt)</label>
-              <div className="debt-input-group">
-                <span className="input-prefix">$</span>
-                <input
-                  id="extra-payment"
-                  type="number"
-                  value={extraPayment}
-                  onChange={(e) => onExtraPaymentChange(e.target.value)}
-                  className="debt-input"
-                  placeholder="1000"
-                />
+            <div className="calc-controls">
+              <div className="field field-lg calc-extra">
+                <label className="field-label" htmlFor="extra-payment">
+                  Extra monthly payment (goes to the target debt)
+                </label>
+                <div className="field-control">
+                  <span className="field-affix">$</span>
+                  <input
+                    id="extra-payment"
+                    type="number"
+                    inputMode="decimal"
+                    value={extraPayment}
+                    onChange={(e) => onExtraPaymentChange(e.target.value)}
+                    placeholder="1000"
+                  />
+                </div>
+              </div>
+
+              <div className="stat-pair calc-totals">
+                <div className="stat">
+                  <span className="stat-value tabular">{formatCurrency(results.totalDebt)}</span>
+                  <span className="stat-label">Total debt</span>
+                </div>
+                <div className="stat">
+                  <span className="stat-value tabular">{formatCurrency(results.totalMinPayment)}/mo</span>
+                  <span className="stat-label">Total minimums</span>
+                </div>
               </div>
             </div>
 
-            <div className="total-summary">
-              <div className="summary-item">
-                <span className="summary-label">Total Debt:</span>
-                <span className="summary-value">{formatCurrency(results.totalDebt)}</span>
-              </div>
-              <div className="summary-item">
-                <span className="summary-label">Total Min Payment:</span>
-                <span className="summary-value">{formatCurrency(results.totalMinPayment)}/mo</span>
-              </div>
-            </div>
-
-            <div className="strategies-grid-three">
+            <div className="calc-strategies">
               <StrategyCard
                 variant="avalanche"
                 badge="Least interest"
@@ -103,7 +115,7 @@ const DebtCalculatorModal = ({ onClose, extraPayment, onExtraPaymentChange }) =>
                 variant="recommended"
                 badge="Recommended"
                 title="Smart Payment Plan"
-                description={`Recommended extra payment of $${results.recommendedExtra}/mo`}
+                description={`An extra ${formatCurrency(results.recommendedExtra)}/mo, sized to your budget`}
                 result={recommended.avalanche}
                 timelineWidth={percentWidth(
                   recommended.avalanche.months,
@@ -113,10 +125,10 @@ const DebtCalculatorModal = ({ onClose, extraPayment, onExtraPaymentChange }) =>
             </div>
           </>
         ) : (
-          <div className="calculator-prompt">Add your debts above to see payoff strategies</div>
+          <p className="sheet-empty">Add your debts above to see payoff strategies</p>
         )}
       </div>
-    </Modal>
+    </Sheet>
   );
 };
 

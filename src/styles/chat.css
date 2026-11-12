@@ -86,6 +86,7 @@
 }
 
 .advisor-nav-item {
+  position: relative;
   display: grid;
   justify-items: center;
   align-content: center;
@@ -104,8 +105,15 @@
   font-weight: var(--weight-semibold);
 }
 
+/* Hidden visually, never from the accessibility tree: the full label is the
+ * button's name at every width. */
 .nav-long {
-  display: none;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
 }
 
 .advisor-disclaimer {
@@ -422,7 +430,11 @@
   }
 
   .nav-long {
-    display: inline;
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip: auto;
   }
 
   .nav-short {

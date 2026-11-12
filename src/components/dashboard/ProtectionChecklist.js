@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertCircle, Check, HelpCircle } from 'lucide-react';
+import { AlertCircle, Check, HelpCircle, ShieldCheck } from 'lucide-react';
 import { STATUS } from '../../lib/protection';
 
 const ICONS = {
@@ -16,20 +16,27 @@ const ProtectionChecklist = ({ checks }) => {
   if (checks.length === 0) return null;
 
   return (
-    <section className="protection-checklist" aria-labelledby="protection-heading">
-      <h3 id="protection-heading">Coverage &amp; Retirement</h3>
-      {checks.map((check) => {
-        const Icon = ICONS[check.status];
-        return (
-          <div className={`protection-item protection-${check.status}`} key={check.key}>
-            <Icon size={16} />
-            <div>
-              <span className="protection-label">{check.label}</span>
-              <span className="protection-detail">{check.detail}</span>
-            </div>
-          </div>
-        );
-      })}
+    <section className="protection" aria-labelledby="protection-heading">
+      <h3 className="sheet-section-title" id="protection-heading">
+        <ShieldCheck size={15} aria-hidden="true" />
+        Coverage &amp; Retirement
+      </h3>
+      <ul className="protection-list">
+        {checks.map((check) => {
+          const Icon = ICONS[check.status];
+          return (
+            <li className={`protection-item protection-${check.status}`} key={check.key}>
+              <span className="protection-icon" aria-hidden="true">
+                <Icon size={14} />
+              </span>
+              <div>
+                <span className="protection-label">{check.label}</span>
+                <span className="protection-detail">{check.detail}</span>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
     </section>
   );
 };

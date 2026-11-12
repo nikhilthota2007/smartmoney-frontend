@@ -5,7 +5,8 @@ import { formatCurrency } from '../../lib/format';
 /**
  * A debt whose minimum payment is smaller than its monthly interest never gets
  * paid off. The simulation used to report this as a 50-year payoff, which reads
- * as a long wait rather than an impossibility.
+ * as a long wait rather than an impossibility. This is the most important thing
+ * on the calculator, so it sits right under the list, in full.
  */
 const DebtWarnings = ({ unpayable, hitsHorizon }) => {
   if (unpayable.length === 0 && !hitsHorizon) return null;
@@ -13,8 +14,8 @@ const DebtWarnings = ({ unpayable, hitsHorizon }) => {
   return (
     <div className="debt-warnings" role="alert">
       {unpayable.map((debt) => (
-        <div className="debt-warning" key={debt.name}>
-          <AlertTriangle size={18} />
+        <div className="notice notice-warning debt-warning" key={debt.name}>
+          <AlertTriangle size={20} aria-hidden="true" />
           <div>
             <strong>{debt.name} never gets paid off at its minimum payment.</strong>
             <p>
@@ -28,8 +29,8 @@ const DebtWarnings = ({ unpayable, hitsHorizon }) => {
       ))}
 
       {hitsHorizon && unpayable.length === 0 && (
-        <div className="debt-warning">
-          <AlertTriangle size={18} />
+        <div className="notice notice-warning debt-warning">
+          <AlertTriangle size={20} aria-hidden="true" />
           <div>
             <strong>These debts are not cleared within 50 years.</strong>
             <p>
