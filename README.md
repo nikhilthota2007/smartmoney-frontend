@@ -9,8 +9,10 @@ An intelligent financial advisory application that provides personalized money-s
 ## Features
 
 - A landing page whose hero is a scroll-driven phone demo, quoting figures the planner actually calculated
-- Guided five-step intake for income, expenses, debts, accounts and goals, with a completeness meter
-- AI-powered financial advice from a Groq-hosted model, which calls the app's own financial logic rather than estimating figures; each calculation it runs appears in the conversation as a card
+- Three-question setup (goal, take-home pay, a statement), then one plan screen
+- Statement analysis: drop a credit card or bank statement (PDF or CSV). It is read and redacted on the device; you get where the money went, up to four specific fixes with what each is worth a month, and what that money does for your goal
+- A detailed editor ("My finances") for income, expenses, debts, accounts and goals, with a completeness meter
+- AI-powered financial advice, which calls the app's own financial logic rather than estimating figures; each calculation it runs appears in the conversation as a card. It runs on the deployment's Groq model, or on the user's own Gemini key if they paste one in Settings
 - Financial health scoring, with coverage and retirement checks alongside it
 - Debt payoff calculator with multiple payment strategies, which warns when a minimum payment never covers the interest
 - Profile saved on your own device, with JSON export and import
@@ -21,7 +23,8 @@ An intelligent financial advisory application that provides personalized money-s
 
 - **Frontend Framework:** React 19 (Create React App)
 - **Styling:** Hand-written CSS on design tokens (`src/styles/tokens.css` holds every colour, size, radius, shadow and easing, with the dark theme as one block of overrides), split by screen under `src/styles/`. Type is Hanken Grotesk, self-hosted. The design and its reasoning are in [`docs/DESIGN.md`](docs/DESIGN.md)
-- **Routing:** React Router 6 (`/` landing, `/start` intake, `/advisor` chat)
+- **Routing:** React Router 6 (`/` landing, `/start` setup, `/plan` the plan and chat, `/numbers` the detailed editor; `/advisor` redirects to `/plan`)
+- **Statements:** pdf.js (loaded only when a PDF is picked) reads the text layer in the browser; `src/lib/statement/` keeps only transaction lines, redacts them, and categorises known merchants on the device
 - **Animation:** anime.js 4, on the landing page only (its route is code-split, so the app screens never load it); everything else is CSS. Reduced-motion users get the finished states
 - **Icons:** Lucide React
 - **Testing:** Jest + React Testing Library
@@ -65,8 +68,14 @@ REACT_APP_API_URL=http://localhost:8080
 ```
 
 4. Open your browser and navigate to `http://localhost:3000`. The landing page is
-   at `/`, the intake at `/start` and the advisor at `/advisor`; `vercel.json`
-   rewrites those paths to `index.html` so a refresh works when deployed.
+   at `/`, setup at `/start`, the plan at `/plan` and the detailed editor at
+   `/numbers`; `vercel.json` rewrites those paths to `index.html` so a refresh
+   works when deployed.
+
+`npm start` and `npm run build` first copy pdf.js's worker into `public/`
+(`scripts/copy-pdf-worker.js`); the bundler breaks it if it processes it.
+`scripts/make-sample-statement.js` builds a fictional statement PDF to try the
+upload with.
 
 ## Available Scripts
 
@@ -93,10 +102,14 @@ about what the advisor is told.**
 
 ```
 api/                  Serverless API (CommonJS — see api/_lib/prompt.js)
-├── chat.js           POST /api/chat
+├── chat.js           POST /api/chat (Groq, or Gemini with the user's X-Gemini-Key)
+├── statement.js      POST /api/statement — sort transactions the device could not
+├── key.js            POST /api/key — check a pasted Gemini key, choose its model
 ├── health.js         GET /api/health — model, prompt and tool versions, key presence
 └── _lib/             Underscore-prefixed, so Vercel does not route it
     ├── advisor.js    The Groq call, message building, reply parsing
+    ├── gemini.js     The Gemini call: contents, tool calls, thought signatures
+    ├── categorize.js Validation and prompt for sorting transactions
     ├── prompt.js     Loads the versioned system prompt
     ├── picture.js    Renders the computed figures the model reads
     ├── tools.js      Loads the tool declarations
@@ -106,10 +119,13 @@ api/                  Serverless API (CommonJS — see api/_lib/prompt.js)
 src/
 ├── Root.js           Router, providers and routes (index.js renders this)
 ├── App.js            The intake and advisor without a router (what App.test.js exercises)
-├── app/              ChatSession: keeps the conversation across routes
+├── app/              ChatSession (the conversation) and StatementContext (the latest statement)
 ├── components/       UI, grouped by feature
 │   ├── brand/        The mark and wordmark
 │   ├── landing/      Landing page: hero, phone, artwork, sections, demo data
+│   ├── onboarding/   Three-question setup
+│   ├── statement/    Upload and review, spending, fixes and goal impact
+│   ├── settings/     Settings sheet and the optional Gemini key
 │   ├── cards/        Payoff, goal and projection cards, score dial
 │   ├── common/       Sheet, list editor, motion gate, theme toggle
 │   ├── intake/       Five-step intake wizard
@@ -123,6 +139,7 @@ src/
 │   ├── healthScore.js
 │   ├── protection.js Coverage and retirement checks
 │   ├── planner/      Debt payoff simulation and warnings
+│   ├── statement/    Statement reading, redaction, categories and analysis
 │   ├── profile.js    Profile schema, migrations and derived summary
 │   ├── profileFile.js JSON export and import
 │   ├── storage.js    localStorage persistence
@@ -148,7 +165,16 @@ logic as tools instead of doing its own arithmetic.
 
 Vercel builds the React app and the `api/` functions from this one repository.
 Set `GROQ_API_KEY` in the project's environment variables; `GROQ_MODEL`
-optionally overrides the model.
+optionally overrides the model. Users can paste their own Gemini key in
+Settings; it is kept in their browser and sent per request in a header, never
+stored on the server. `GEMINI_MODEL` pins the Gemini model, which is otherwise
+chosen per key from the models it can use.
+
+**Privacy:** a statement is read in the browser. Only transaction lines are
+kept, descriptions are redacted (account numbers, emails, phones, reference
+codes, people in payment-app transfers, the cardholder's name), and only
+descriptions of merchants the device does not recognise are sent to be sorted,
+with amounts and no dates, after the user has seen them.
 
 `GET /api/health` reports what a deployment is actually running:
 

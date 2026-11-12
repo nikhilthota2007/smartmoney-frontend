@@ -552,3 +552,52 @@ Decisions from the review of this plan, then changes made while building.
 - **The advisor's tab bar** keeps its full labels in the accessibility tree at every width (an early version hid them with `display: none`, which removed the names).
 - **The live check** ran the unchanged `api/chat.js` handler on a throwaway local server instead of `vercel dev`. The model called `simulate_debt_payoff`, the card rendered and the explanation quoted the same figures. A second question hit Groq's per-minute token limit for this key (8,000 TPM), which the app reported with its existing generic error.
 
+## 13. Round two: a simpler flow, statements, an optional Gemini key
+
+After using the first build: the opening was right, but after the first two
+scrolls there were too many screens (a strip, a footer, a 5-step wizard with a
+rail, a chat with its own rail and four destinations, two sheets).
+
+**The flow now:** landing (hero, claim, one-line footer) → setup at `/start`
+(goal, take-home pay, statement; each skippable) → one plan screen at `/plan`.
+The detailed editor still exists at `/numbers` ("My finances"); the score and
+calculator are chips above the composer; everything else is one Settings sheet.
+
+**Statements, and how personal data is kept out:**
+
+1. pdf.js reads the PDF's text layer in the browser (CSV is parsed directly).
+   Scans and photos have no text layer and are refused with an explanation.
+2. Only lines shaped like a transaction (date, description, amount) are kept,
+   plus the summary figures (balance, minimum, APR, due date, period). This
+   drops the name, address and account number structurally, which is more
+   reliable than trying to find and replace them.
+3. Each description is redacted as a second layer: card and account numbers
+   (kept as last four), emails, phones, reference codes, the other person in
+   Zelle/Venmo/Cash App transfers, and the cardholder's name when the address
+   block shows it.
+4. Common merchants are categorised on the device. Only the descriptions it
+   does not know (with amounts, no dates) are sent to be sorted, and the user
+   sees that exact list first. The fictional test statement sends nothing.
+5. Totals, monthly scaling, fixes and goal impact are computed in code
+   (`src/lib/statement/analyze.js` and the existing tools). Each fix states its
+   assumption ("cook or pick up half of them"); the late-fee one is exact.
+
+**The Gemini key** is optional. Without one, the deployment's Groq model
+answers. With one, chat and sorting run on the user's key: kept in their
+browser, sent per request in a header to SmartMoney's API, which uses it for
+that request only. The model is chosen from the key's own model list (newest
+stable Flash), because Gemini model names change too often to hard-code.
+Newer models' thought signatures are carried on the stored tool calls and sent
+back unchanged. Settings says plainly that Google's free tier may use what is
+sent to improve its products.
+
+**Limits:**
+- One statement at a time (the newest replaces the last).
+- A card statement is only part of someone's money.
+- Bank statements without signed amounts rely on keywords to tell deposits
+  from spending.
+- Merchants with unusual names fall back to the AI or to Other.
+- The Gemini path is covered by tests against Google's documented formats but
+  had no live run during the build (no key was available); the Groq path was
+  run live.
+
