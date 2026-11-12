@@ -1,21 +1,25 @@
 import React, { useState } from 'react';
 import '@fontsource-variable/hanken-grotesk';
 import './index.css';
-import { ProfileProvider, useProfile } from './context/ProfileContext';
+import { ProfileProvider } from './context/ProfileContext';
 import { ThemeProvider } from './context/ThemeContext';
-import { useChat } from './hooks/useChat';
+import { ChatSessionProvider, openConversation, useChatSession } from './app/ChatSession';
 import IntakeWizard from './components/intake/IntakeWizard';
 import ChatWindow from './components/chat/ChatWindow';
 
+/**
+ * The wizard and the advisor, switched by state.
+ *
+ * This is the app without a router: it opens straight on the wizard. Root.js
+ * wraps the same screens in routes and adds the landing page; this component
+ * stays as the router-free contract that src/App.test.js exercises.
+ */
 const AdvisorScreens = () => {
-  const { profile } = useProfile();
-  const chat = useChat(profile);
+  const chat = useChatSession();
   const [showChat, setShowChat] = useState(false);
 
   const startChat = () => {
-    // Only greet on a fresh conversation — coming back from editing finances
-    // must not discard what has already been said.
-    if (chat.messages.length === 0) chat.startConversation();
+    openConversation(chat);
     setShowChat(true);
   };
 
@@ -30,7 +34,9 @@ export default function App() {
   return (
     <ThemeProvider>
       <ProfileProvider>
-        <AdvisorScreens />
+        <ChatSessionProvider>
+          <AdvisorScreens />
+        </ChatSessionProvider>
       </ProfileProvider>
     </ThemeProvider>
   );
