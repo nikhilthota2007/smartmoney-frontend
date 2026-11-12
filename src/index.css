@@ -11,7 +11,10 @@
 @import './styles/cards.css';
 @import './styles/app.css';
 @import './styles/intake.css';
+@import './styles/home.css';
 @import './styles/chat.css';
+@import './styles/onboarding.css';
+@import './styles/statement.css';
 @import './styles/sheet.css';
 @import './styles/health-score.css';
 @import './styles/debt-calculator.css';

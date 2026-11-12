@@ -23,10 +23,12 @@ export const readPdfLines = async (file) => {
   const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
   pdfjs.GlobalWorkerOptions.workerSrc = `${process.env.PUBLIC_URL || ''}/pdf.worker.min.mjs`;
 
+  let task;
   let doc;
   try {
     const data = new Uint8Array(await file.arrayBuffer());
-    doc = await pdfjs.getDocument({ data, isEvalSupported: false }).promise;
+    task = pdfjs.getDocument({ data, isEvalSupported: false });
+    doc = await task.promise;
   } catch (error) {
     if (error && error.name === 'PasswordException') {
       throw new StatementReadError('password', 'This PDF is password-protected. Download an unlocked copy from your bank and try again.');
@@ -48,8 +50,10 @@ export const readPdfLines = async (file) => {
       }));
       lines.push(...itemsToLines(items));
     }
+  } catch {
+    throw new StatementReadError('unreadable', "That PDF couldn't be read. Try downloading it again, or use a CSV export.");
   } finally {
-    doc.destroy();
+    task.destroy();
   }
 
   if (lines.join('').trim().length < 40) {

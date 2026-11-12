@@ -5,6 +5,8 @@ import './index.css';
 import { ProfileProvider } from './context/ProfileContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { ChatSessionProvider, openConversation, useChatSession } from './app/ChatSession';
+import { StatementProvider } from './app/StatementContext';
+import Onboarding from './components/onboarding/Onboarding';
 import IntakeWizard from './components/intake/IntakeWizard';
 import ChatWindow from './components/chat/ChatWindow';
 
@@ -13,8 +15,9 @@ const Landing = lazy(() => import('./components/landing/Landing'));
 
 const TITLES = {
   '/': 'SmartMoney: money, minus the dread',
-  '/start': 'Your numbers · SmartMoney',
-  '/advisor': 'Your advisor · SmartMoney',
+  '/start': 'Get started · SmartMoney',
+  '/plan': 'Your plan · SmartMoney',
+  '/numbers': 'Your numbers · SmartMoney',
 };
 
 /** New page, new title, top of the page. */
@@ -29,12 +32,19 @@ const RouteEffects = () => {
   return null;
 };
 
+/** Three questions, then the plan. */
 const StartRoute = () => {
   const navigate = useNavigate();
-  return <IntakeWizard onFinish={() => navigate('/advisor')} />;
+  return <Onboarding onFinish={() => navigate('/plan')} />;
 };
 
-const AdvisorRoute = () => {
+/** The detailed editor: every income, expense, debt, account and goal. */
+const NumbersRoute = () => {
+  const navigate = useNavigate();
+  return <IntakeWizard onFinish={() => navigate('/plan')} />;
+};
+
+const PlanRoute = () => {
   const chat = useChatSession();
   const navigate = useNavigate();
 
@@ -43,7 +53,7 @@ const AdvisorRoute = () => {
     openConversation(chat);
   }, [chat]);
 
-  return <ChatWindow chat={chat} onEditFinances={() => navigate('/start')} />;
+  return <ChatWindow chat={chat} onEditFinances={() => navigate('/numbers')} />;
 };
 
 /** The routes on their own, so tests can mount them in a MemoryRouter. */
@@ -60,7 +70,10 @@ export const AppRoutes = () => (
         }
       />
       <Route path="/start" element={<StartRoute />} />
-      <Route path="/advisor" element={<AdvisorRoute />} />
+      <Route path="/plan" element={<PlanRoute />} />
+      <Route path="/numbers" element={<NumbersRoute />} />
+      {/* The plan used to live at /advisor. */}
+      <Route path="/advisor" element={<Navigate to="/plan" replace />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   </>
@@ -69,7 +82,9 @@ export const AppRoutes = () => (
 export const AppProviders = ({ children }) => (
   <ThemeProvider>
     <ProfileProvider>
-      <ChatSessionProvider>{children}</ChatSessionProvider>
+      <StatementProvider>
+        <ChatSessionProvider>{children}</ChatSessionProvider>
+      </StatementProvider>
     </ProfileProvider>
   </ThemeProvider>
 );

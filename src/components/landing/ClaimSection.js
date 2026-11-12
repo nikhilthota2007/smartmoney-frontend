@@ -35,6 +35,7 @@ const ClaimSection = ({ motion }) => {
       <Link to="/start" className="btn-glass claim-cta">
         Get my plan
       </Link>
+      <p className="claim-note">Three questions and a statement. Saved on this device, not in an account.</p>
     </section>
   );
 };

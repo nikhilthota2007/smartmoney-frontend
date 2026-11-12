@@ -1,91 +1,153 @@
 import React, { useRef, useState } from 'react';
-import { Activity, CreditCard, MessageCircle, RotateCcw, SlidersHorizontal } from 'lucide-react';
-import DarkModeToggle from '../common/DarkModeToggle';
+import { Activity, CreditCard, FileText, Settings2, SlidersHorizontal } from 'lucide-react';
 import AppBrand from '../common/AppBrand';
+import Sheet from '../common/Sheet';
 import MessageList from './MessageList';
 import ChatInput from './ChatInput';
 import HealthScoreModal from '../dashboard/HealthScoreModal';
 import DebtCalculatorModal from '../planning/DebtCalculatorModal';
+import SettingsSheet from '../settings/SettingsSheet';
+import StatementFlow from '../statement/StatementFlow';
+import StatementInsights from '../statement/StatementInsights';
+import { useStatement } from '../../app/StatementContext';
+import { useProfile } from '../../context/ProfileContext';
+import { loadAiKey } from '../../lib/aiKey';
+
+/** The goal set during setup (or the first one entered), for the plan's header. */
+const planGoal = (goals) => goals.find((goal) => goal.source === 'onboarding') || goals.find((goal) => goal.name);
 
 /**
- * One navigation, two layouts: a rail on wide screens, a tab bar on phones.
- * Each item carries its full name and a short label; the short one is
- * aria-hidden, so the accessible name is always the full one.
+ * The plan: one screen. What the statement showed, then a conversation about
+ * it. Everything else (numbers, score, calculator, settings) is one tap away
+ * and comes back here.
  */
-const NavItem = ({ icon: Icon, label, short, current, onClick }) => (
-  <button className={`advisor-nav-item${current ? ' is-current' : ''}`} onClick={onClick} aria-current={current ? 'page' : undefined}>
-    <Icon size={20} aria-hidden="true" />
-    <span className="nav-long">{label}</span>
-    <span className="nav-short" aria-hidden="true">
-      {short}
-    </span>
-  </button>
-);
-
 const ChatWindow = ({ chat, onEditFinances }) => {
   const { messages, visible, input, setInput, loading, runningTool, sendMessage, clearChat } = chat;
-  const [showHealthScore, setShowHealthScore] = useState(false);
-  const [showCalculator, setShowCalculator] = useState(false);
+  const { profile } = useProfile();
+  const { saved, reset } = useStatement();
+  const [sheet, setSheet] = useState(null);
+  const [hasOwnKey, setHasOwnKey] = useState(() => Boolean(loadAiKey()));
   // Kept here so the figure survives closing and reopening the calculator.
   const [extraPayment, setExtraPayment] = useState('');
   const inputRef = useRef(null);
 
-  const focusInput = () => inputRef.current?.focus();
+  const goal = planGoal(profile.goals);
+  const close = () => setSheet(null);
   const askExample = (question) => {
     setInput(question);
-    focusInput();
+    inputRef.current?.focus();
+  };
+  const openStatement = () => {
+    reset();
+    setSheet('statement');
   };
 
   return (
-    <div className="advisor-shell">
+    <div className="home">
       <span className="advisor-glow" aria-hidden="true" />
 
-      <aside className="advisor-rail">
-        <div className="advisor-rail-top">
-          <AppBrand />
-          <div className="advisor-rail-tools">
-            <button className="icon-btn advisor-clear" onClick={clearChat} title="Clear Chat">
-              <RotateCcw size={18} aria-hidden="true" />
-              <span className="advisor-clear-label">Clear chat</span>
-            </button>
-            <DarkModeToggle className="icon-btn" />
-          </div>
+      <header className="home-bar">
+        <AppBrand />
+        <div className="home-bar-actions">
+          <button className="btn btn-outline btn-small" onClick={onEditFinances}>
+            <SlidersHorizontal size={15} aria-hidden="true" />
+            My finances
+          </button>
+          <button className="icon-btn" aria-label="Settings" onClick={() => setSheet('settings')}>
+            <Settings2 size={20} aria-hidden="true" />
+          </button>
         </div>
+      </header>
 
-        <nav className="advisor-nav" aria-label="Advisor">
-          <NavItem icon={MessageCircle} label="Ask" short="Ask" current onClick={focusInput} />
-          <NavItem icon={SlidersHorizontal} label="My Finances" short="Finances" onClick={onEditFinances} />
-          <NavItem icon={Activity} label="Financial Health Score" short="Score" onClick={() => setShowHealthScore(true)} />
-          <NavItem icon={CreditCard} label="Debt Payoff Calculator" short="Payoff" onClick={() => setShowCalculator(true)} />
-        </nav>
+      <main className="home-main">
+        <section className="home-intro">
+          <h2 className="home-title">{saved ? "Here's your plan." : "Let's find your extra money."}</h2>
+          <p className="home-sub">
+            {goal ? (
+              <>
+                Working toward: <strong>{goal.name}</strong>
+              </>
+            ) : (
+              'Ask anything below, or add a statement to see where it goes.'
+            )}
+          </p>
+        </section>
 
-        <p className="advisor-disclaimer">
-          Every figure comes from your own numbers. Educational information, not licensed financial advice.
-        </p>
-      </aside>
+        {saved ? (
+          <StatementInsights />
+        ) : (
+          <section className="card home-upload" aria-labelledby="upload-title">
+            <h2 className="section-title" id="upload-title">
+              Add a statement
+            </h2>
+            <p className="home-upload-sub">See where your money went and three ways to keep more of it.</p>
+            <StatementFlow />
+          </section>
+        )}
 
-      <main className="advisor-main">
-        <MessageList
-          messages={messages}
-          loading={loading}
-          runningTool={runningTool}
-          showExamples={visible.length === 1}
-          onExampleClick={askExample}
-        />
-
-        <ChatInput value={input} onChange={setInput} onSend={() => sendMessage()} loading={loading} inputRef={inputRef} />
+        <section className="home-chat" aria-labelledby="chat-title">
+          <h2 className="section-title" id="chat-title">
+            Ask about your money
+          </h2>
+          <MessageList
+            messages={messages}
+            loading={loading}
+            runningTool={runningTool}
+            showExamples={visible.length === 1}
+            onExampleClick={askExample}
+          />
+        </section>
       </main>
 
-      {showHealthScore && (
-        <HealthScoreModal onClose={() => setShowHealthScore(false)} onAddFigures={onEditFinances} />
+      <div className="home-dock">
+        <div className="quick-actions">
+          <button className="chip-button quick" onClick={openStatement}>
+            <FileText size={15} aria-hidden="true" />
+            {saved ? 'New statement' : 'Add statement'}
+          </button>
+          <button className="chip-button quick" onClick={() => setSheet('score')} aria-label="Financial Health Score">
+            <Activity size={15} aria-hidden="true" />
+            Health score
+          </button>
+          <button className="chip-button quick" onClick={() => setSheet('payoff')} aria-label="Debt Payoff Calculator">
+            <CreditCard size={15} aria-hidden="true" />
+            Payoff calculator
+          </button>
+        </div>
+        <ChatInput value={input} onChange={setInput} onSend={() => sendMessage()} loading={loading} inputRef={inputRef} />
+        {!hasOwnKey && (
+          <p className="dock-note">
+            Using the built-in AI.{' '}
+            <button className="link-button" onClick={() => setSheet('settings')}>
+              Add your own Gemini key
+            </button>{' '}
+            for unlimited questions.
+          </p>
+        )}
+      </div>
+
+      {sheet === 'statement' && (
+        <Sheet onClose={close} labelledBy="statement-sheet-title">
+          <header className="sheet-head">
+            <h2 className="sheet-title" id="statement-sheet-title">
+              {saved ? 'A new statement' : 'Add a statement'}
+            </h2>
+            <p className="sheet-lede">The newest statement replaces the last one in your plan.</p>
+          </header>
+          <div className="sheet-body">
+            <StatementFlow onDone={close} />
+          </div>
+        </Sheet>
       )}
 
-      {showCalculator && (
-        <DebtCalculatorModal
-          onClose={() => setShowCalculator(false)}
-          extraPayment={extraPayment}
-          onExtraPaymentChange={setExtraPayment}
-        />
+      {sheet === 'score' && <HealthScoreModal onClose={close} onAddFigures={onEditFinances} />}
+
+      {sheet === 'payoff' && (
+        <DebtCalculatorModal onClose={close} extraPayment={extraPayment} onExtraPaymentChange={setExtraPayment} />
+      )}
+
+      {sheet === 'settings' && (
+        <SettingsSheet onClose={close} onClearChat={clearChat} onKeyChange={(next) => setHasOwnKey(Boolean(next))} />
       )}
     </div>
   );

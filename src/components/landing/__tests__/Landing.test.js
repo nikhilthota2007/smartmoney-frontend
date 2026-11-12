@@ -64,7 +64,7 @@ describe('landing page, finished state', () => {
       JSON.stringify({ schemaVersion: 2, income: [{ id: 1, source: 'Pay', netMonthly: '3000', stability: 'stable' }] })
     );
     renderLanding();
-    expect(screen.getByRole('link', { name: /open my plan/i })).toHaveAttribute('href', '/advisor');
+    expect(screen.getByRole('link', { name: /open my plan/i })).toHaveAttribute('href', '/plan');
   });
 });
 

@@ -4,6 +4,7 @@ import './index.css';
 import { ProfileProvider } from './context/ProfileContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { ChatSessionProvider, openConversation, useChatSession } from './app/ChatSession';
+import { StatementProvider } from './app/StatementContext';
 import IntakeWizard from './components/intake/IntakeWizard';
 import ChatWindow from './components/chat/ChatWindow';
 
@@ -34,9 +35,11 @@ export default function App() {
   return (
     <ThemeProvider>
       <ProfileProvider>
-        <ChatSessionProvider>
-          <AdvisorScreens />
-        </ChatSessionProvider>
+        <StatementProvider>
+          <ChatSessionProvider>
+            <AdvisorScreens />
+          </ChatSessionProvider>
+        </StatementProvider>
       </ProfileProvider>
     </ThemeProvider>
   );

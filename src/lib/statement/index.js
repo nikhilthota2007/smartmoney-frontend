@@ -14,6 +14,7 @@ import { parseStatementText } from './parse';
 import { parseStatementCsv } from './csv';
 import { findHolderNames, redactDescription } from './redact';
 import { categorizeLocally, CATEGORY_KEYS } from './categories';
+import { readFileAsText } from '../profileFile';
 
 export { analyzeSpending, merchantName } from './analyze';
 export { CATEGORIES, CATEGORY_KEYS } from './categories';
@@ -73,7 +74,7 @@ export const readStatementFile = async (file) => {
     return prepareStatement({ lines: await readPdfLines(file) });
   }
   if (isCsv(file)) {
-    return prepareStatement({ csvText: await file.text() });
+    return prepareStatement({ csvText: await readFileAsText(file) });
   }
   if (/^image\//.test(file.type || '')) {
     throw new UnsupportedFileError("Photos aren't supported yet. Download the statement PDF from your bank's website, or export a CSV.");

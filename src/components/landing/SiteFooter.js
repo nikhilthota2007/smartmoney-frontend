@@ -9,22 +9,11 @@ const SiteFooter = () => (
       <Link to="/" className="site-footer-brand" aria-label="SmartMoney home">
         <Wordmark />
       </Link>
-      <nav className="site-footer-links" aria-label="Footer">
-        <Link to="/start">Get my plan</Link>
-        <Link to="/advisor">Ask the advisor</Link>
-      </nav>
       <DarkModeToggle className="icon-btn site-footer-theme" />
     </div>
-    <div className="site-footer-notes">
-      <p>
-        Saved on this device, not in an account. Your figures are sent to the AI model only when you ask a question.
-      </p>
-      <p>
-        Educational information, not licensed financial, tax or legal advice. For big decisions, talk to a licensed
-        professional.
-      </p>
-      <p>© {new Date().getFullYear()} SmartMoney</p>
-    </div>
+    <p className="site-footer-note">
+      Educational information, not licensed financial, tax or legal advice. © {new Date().getFullYear()} SmartMoney
+    </p>
   </footer>
 );
 

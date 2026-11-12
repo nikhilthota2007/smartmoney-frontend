@@ -29,7 +29,7 @@ const SiteHeader = ({ watchRef }) => {
       <Link to="/" className="site-header-brand" aria-label="SmartMoney home">
         <Wordmark />
       </Link>
-      <Link to={returning ? '/advisor' : '/start'} className="btn btn-small site-header-cta">
+      <Link to={returning ? '/plan' : '/start'} className="btn btn-small site-header-cta">
         {returning ? 'Open my plan' : 'Get my plan'}
         <ArrowRight size={15} aria-hidden="true" />
       </Link>
