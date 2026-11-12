@@ -1,6 +1,6 @@
 # SmartMoney redesign: design plan
 
-**Status:** plan only, written 2026-11-12. No app code has changed. The only file added is this one, on the branch `redesign-cleo-style`.
+**Status:** built on the branch `redesign-cleo-style`, 2026-11-12, following the build order in section 8. Section 12 records where the build differs from this plan. Everything else below describes what shipped.
 
 **Goal:** make SmartMoney look and move like the reference (Cleo's marketing site, first two scroll sections) while staying its own brand and keeping every feature working.
 
@@ -537,3 +537,18 @@ Alternates for the heading: "Real numbers. No lectures." · "You bring the mess.
 | Dark mode regressions | One variable block replaces the override pile, and every screen is screenshotted in both themes. |
 | Deep links 404 on Vercel | Explicit rewrite, plus your check on the preview (question 7). |
 | Two money formats on screen | Question 3. |
+
+## 12. Where the build differs from this plan
+
+Decisions from the review of this plan, then changes made while building.
+
+- **Answers to section 1.** Hanken Grotesk, the section 9 copy, the payoff card in the phone, the strip and footer, a few live calls, the `vercel.json` rewrite and an original mark were all approved as proposed. The protected text (greeting, completeness hints, score tips) was rewritten and money now formats as `$5,000`, in one separate commit with its test expectations; no calculation changed.
+- **Dark mode tokens** live on `body.dark-mode` (the class `ThemeContext` already sets) and also on `[data-theme='dark']`. A `.theme-light` scope re-applies the light roles to the phone screen, which is artwork of the app and stays light in either theme.
+- **The phone's final size** is 79% of the stage height on phones (68% of the viewport width at rest) and 70% on wide screens, tuned against the reference's mobile checkpoints: the screen fills the viewport around 450px of scroll, the phone is 91% of the width at 800px (reference about 85%) and 68% at the end (reference about 70%).
+- **The hero art** dropped the path through the hills: once the phone sat in front of it, what showed was a disconnected squiggle. Fireflies over the hills carry the time-based motion with the sun's halo and the clouds. The sun moved right of centre so it is visible beside the phone.
+- **Word reveals in chat** apply only to replies that arrive while the thread is on screen, and only when motion is allowed, so tests and reduced-motion users get plain text.
+- **formatMessage** now renders `**bold**` and `*italic*`; the live model uses both and the asterisks used to print.
+- **Inputs** have a 1px boundary at rest. The fill alone did not make the fields easy enough to find.
+- **The advisor's tab bar** keeps its full labels in the accessibility tree at every width (an early version hid them with `display: none`, which removed the names).
+- **The live check** ran the unchanged `api/chat.js` handler on a throwaway local server instead of `vercel dev`. The model called `simulate_debt_payoff`, the card rendered and the explanation quoted the same figures. A second question hit Groq's per-minute token limit for this key (8,000 TPM), which the app reported with its existing generic error.
+

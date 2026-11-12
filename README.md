@@ -8,18 +8,21 @@ An intelligent financial advisory application that provides personalized money-s
 
 ## Features
 
+- A landing page whose hero is a scroll-driven phone demo, quoting figures the planner actually calculated
 - Guided five-step intake for income, expenses, debts, accounts and goals, with a completeness meter
-- AI-powered financial advice from a Groq-hosted model, which calls the app's own financial logic rather than estimating figures
+- AI-powered financial advice from a Groq-hosted model, which calls the app's own financial logic rather than estimating figures; each calculation it runs appears in the conversation as a card
 - Financial health scoring, with coverage and retirement checks alongside it
 - Debt payoff calculator with multiple payment strategies, which warns when a minimum payment never covers the interest
 - Profile saved on your own device, with JSON export and import
-- Dark mode interface
+- Light and dark themes from one set of design tokens
 - Responsive design optimized for mobile and desktop
 
 ## Technology Stack
 
 - **Frontend Framework:** React 19 (Create React App)
-- **Styling:** Hand-written CSS, split by component under `src/styles/`
+- **Styling:** Hand-written CSS on design tokens (`src/styles/tokens.css` holds every colour, size, radius, shadow and easing, with the dark theme as one block of overrides), split by screen under `src/styles/`. Type is Hanken Grotesk, self-hosted. The design and its reasoning are in [`docs/DESIGN.md`](docs/DESIGN.md)
+- **Routing:** React Router 6 (`/` landing, `/start` intake, `/advisor` chat)
+- **Animation:** anime.js 4, on the landing page only (its route is code-split, so the app screens never load it); everything else is CSS. Reduced-motion users get the finished states
 - **Icons:** Lucide React
 - **Testing:** Jest + React Testing Library
 - **Hosting:** Vercel
@@ -61,7 +64,9 @@ it at a running backend instead:
 REACT_APP_API_URL=http://localhost:8080
 ```
 
-4. Open your browser and navigate to `http://localhost:3000`
+4. Open your browser and navigate to `http://localhost:3000`. The landing page is
+   at `/`, the intake at `/start` and the advisor at `/advisor`; `vercel.json`
+   rewrites those paths to `index.html` so a refresh works when deployed.
 
 ## Available Scripts
 
@@ -99,10 +104,16 @@ api/                  Serverless API (CommonJS — see api/_lib/prompt.js)
     └── tools/        Versioned tool schemas
 
 src/
+├── Root.js           Router, providers and routes (index.js renders this)
+├── App.js            The intake and advisor without a router (what App.test.js exercises)
+├── app/              ChatSession: keeps the conversation across routes
 ├── components/       UI, grouped by feature
-│   ├── common/       Modal, currency field, dark-mode toggle
+│   ├── brand/        The mark and wordmark
+│   ├── landing/      Landing page: hero, phone, artwork, sections, demo data
+│   ├── cards/        Payoff, goal and projection cards, score dial
+│   ├── common/       Sheet, list editor, motion gate, theme toggle
 │   ├── intake/       Five-step intake wizard
-│   ├── chat/         Conversation view and message rendering
+│   ├── chat/         Conversation, thread builder, tool cards
 │   ├── dashboard/    Financial health score
 │   └── planning/     Debt payoff calculator
 ├── context/          Profile and theme state
@@ -116,7 +127,8 @@ src/
 │   ├── profileFile.js JSON export and import
 │   ├── storage.js    localStorage persistence
 │   └── api.js        API client (same origin by default)
-└── styles/           CSS, imported in cascade order by index.css
+└── styles/           tokens.css first, then base, primitives and one file per screen;
+                      index.css imports them in cascade order (landing.css loads with its route)
 ```
 
 **All financial calculations live in `src/lib/` as pure functions** and are covered by
