@@ -346,7 +346,7 @@
 }
 
 .composer-input::placeholder {
-  color: var(--color-faint);
+  color: var(--color-muted);
 }
 
 .composer-send {
