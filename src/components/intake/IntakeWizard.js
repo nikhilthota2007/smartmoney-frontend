@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { ArrowLeft, ArrowRight, PiggyBank, Sparkles, TrendingUp } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { ArrowLeft, ArrowRight, Check, MessageCircle } from 'lucide-react';
 import DarkModeToggle from '../common/DarkModeToggle';
 import ListEditor from '../common/ListEditor';
+import AppBrand from '../common/AppBrand';
 import CompletenessMeter from './CompletenessMeter';
 import ProfileFileControls from './ProfileFileControls';
 import { WIZARD_STEPS } from './steps';
@@ -16,29 +17,37 @@ const firstIncompleteStep = (completeness) => {
   return index === -1 ? 0 : index;
 };
 
+/**
+ * Five steps, one question in focus. On a wide screen the steps, the meter
+ * and the file controls sit in a rail on the left; on a phone they stack
+ * above and below the question, with the step actions pinned to the bottom.
+ */
 const IntakeWizard = ({ onFinish }) => {
   const { profile } = useProfile();
   const completeness = profileCompleteness(profile);
   const [stepIndex, setStepIndex] = useState(() => firstIncompleteStep(completeness));
+  const questionRef = useRef(null);
+  const firstRender = useRef(true);
 
   const step = WIZARD_STEPS[stepIndex];
   const isLastStep = stepIndex === WIZARD_STEPS.length - 1;
+  const isDone = (key) => completeness.sections.some((section) => section.key === key && section.complete);
+
+  // A new step starts at its question, not wherever the last one was scrolled to.
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
+    }
+    questionRef.current?.scrollIntoView?.({ block: 'start' });
+  }, [stepIndex]);
 
   return (
-    <div className="app-container">
-      <DarkModeToggle />
-
-      <div className="form-container-centered wizard">
-        <div className="header">
-          <div className="icon-circle">
-            <TrendingUp size={40} />
-          </div>
-          <h1>SmartMoney</h1>
-          <p className="subtitle">Get personalized advice to save money and achieve your financial goals</p>
-          <div className="status-badge">
-            <Sparkles size={14} />
-            Powered by AI
-          </div>
+    <div className="wizard-shell">
+      <aside className="wizard-rail">
+        <div className="wizard-rail-top">
+          <AppBrand />
+          <DarkModeToggle className="icon-btn" />
         </div>
 
         <CompletenessMeter completeness={completeness} />
@@ -47,72 +56,84 @@ const IntakeWizard = ({ onFinish }) => {
           {WIZARD_STEPS.map((wizardStep, index) => (
             <button
               key={wizardStep.key}
-              className={`wizard-step-tab${index === stepIndex ? ' is-current' : ''}`}
+              className={`wizard-step${index === stepIndex ? ' is-current' : ''}${isDone(wizardStep.key) ? ' is-done' : ''}`}
               onClick={() => setStepIndex(index)}
               aria-current={index === stepIndex ? 'step' : undefined}
             >
-              {wizardStep.title}
+              <span className="wizard-step-marker" aria-hidden="true">
+                {isDone(wizardStep.key) ? <Check size={13} strokeWidth={2.5} /> : index + 1}
+              </span>
+              <span className="wizard-step-title">{wizardStep.title}</span>
             </button>
           ))}
         </nav>
 
-        <div className="section-header">
-          <PiggyBank size={20} />
-          {step.title}
+        <div className="wizard-rail-foot">
+          <ProfileFileControls />
+          <p className="wizard-disclaimer">
+            Educational information, not licensed financial advice. For big decisions, talk to a professional.
+          </p>
         </div>
-        <p className="wizard-subtitle">{step.subtitle}</p>
+      </aside>
 
-        {step.lists.map((list) => (
-          <section className="wizard-list" key={list.section}>
-            {list.heading && <h3 className="wizard-list-heading">{list.heading}</h3>}
-            <ListEditor
-              section={list.section}
-              fields={list.fields}
-              items={getSectionList(profile, list.section)}
-              addLabel={list.addLabel}
-              emptyMessage={list.emptyMessage}
-            />
-          </section>
-        ))}
+      <main className="wizard-main">
+        <section className="wizard-question" key={step.key} ref={questionRef} aria-labelledby="wizard-title">
+          <p className="wizard-count">
+            Step {stepIndex + 1} of {WIZARD_STEPS.length}
+          </p>
+          <h2 className="wizard-title" id="wizard-title">
+            {step.title}
+          </h2>
+          <p className="wizard-subtitle">{step.subtitle}</p>
 
-        <div className="wizard-nav">
+          {step.lists.map((list) => (
+            <section className="wizard-list" key={list.section}>
+              {list.heading && <h3 className="wizard-list-heading">{list.heading}</h3>}
+              <ListEditor
+                section={list.section}
+                fields={list.fields}
+                items={getSectionList(profile, list.section)}
+                addLabel={list.addLabel}
+                emptyMessage={list.emptyMessage}
+              />
+            </section>
+          ))}
+        </section>
+
+        <div className="wizard-actions">
           <button
-            className="text-btn"
+            className="btn btn-quiet"
             onClick={() => setStepIndex(stepIndex - 1)}
             disabled={stepIndex === 0}
           >
-            <ArrowLeft size={16} />
+            <ArrowLeft size={16} aria-hidden="true" />
             Back
           </button>
 
-          {!isLastStep && (
-            <button className="text-btn" onClick={() => setStepIndex(stepIndex + 1)}>
-              Skip for now
-            </button>
-          )}
-
-          {isLastStep ? (
-            <button className="submit-btn wizard-primary" onClick={onFinish}>
-              Start Getting Financial Advice
-            </button>
-          ) : (
-            <button className="submit-btn wizard-primary" onClick={() => setStepIndex(stepIndex + 1)}>
-              Next
-              <ArrowRight size={16} />
-            </button>
-          )}
+          <div className="wizard-actions-end">
+            {!isLastStep && (
+              <button className="btn btn-quiet" onClick={() => setStepIndex(stepIndex + 1)}>
+                Skip for now
+              </button>
+            )}
+            {isLastStep ? (
+              <button className="btn btn-primary btn-lg wizard-next" onClick={onFinish}>
+                Ask my advisor
+                <MessageCircle size={16} aria-hidden="true" />
+              </button>
+            ) : (
+              <button className="btn btn-primary btn-lg wizard-next" onClick={() => setStepIndex(stepIndex + 1)}>
+                Next
+                <ArrowRight size={16} aria-hidden="true" />
+              </button>
+            )}
+          </div>
         </div>
 
-        <button className="text-btn wizard-skip-all" onClick={onFinish}>
+        <button className="wizard-skip-all" onClick={onFinish}>
           Skip the rest and start asking questions
         </button>
-
-        <ProfileFileControls />
-
-        <div className="disclaimer-inline">
-          This is for educational purposes. Always consult with a licensed financial advisor for important decisions.
-        </div>
-      </div>
+      </main>
     </div>
   );
 };

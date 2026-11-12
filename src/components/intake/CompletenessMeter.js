@@ -1,32 +1,20 @@
 import React from 'react';
-import { Check } from 'lucide-react';
 
+/** How much the advisor knows, and the one thing to add next. */
 const CompletenessMeter = ({ completeness }) => (
-  <div className="completeness">
-    <div className="completeness-header">
-      <span className="completeness-percent">{completeness.percent}% complete</span>
-      {completeness.nextAction && <span className="completeness-hint">{completeness.nextAction}</span>}
-    </div>
-
+  <div className="meter">
+    <p className="meter-percent tabular">{completeness.percent}% complete</p>
     <div
-      className="progress-bar"
+      className="bar meter-bar"
       role="progressbar"
       aria-label="Profile completeness"
       aria-valuenow={completeness.percent}
       aria-valuemin={0}
       aria-valuemax={100}
     >
-      <div className="progress-fill completeness-fill" style={{ width: `${completeness.percent}%` }}></div>
+      <div className="bar-fill bar-fill-accent" style={{ width: `${completeness.percent}%` }} />
     </div>
-
-    <ul className="completeness-sections">
-      {completeness.sections.map((section) => (
-        <li key={section.key} className={section.complete ? 'section-done' : 'section-todo'}>
-          {section.complete && <Check size={14} />}
-          {section.label}
-        </li>
-      ))}
-    </ul>
+    {completeness.nextAction && <p className="meter-hint">{completeness.nextAction}</p>}
   </div>
 );
 

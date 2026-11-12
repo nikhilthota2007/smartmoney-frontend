@@ -61,14 +61,6 @@
   letter-spacing: -0.01em;
 }
 
-.mark .mark-sun {
-  fill: var(--color-accent);
-}
-
-.mark .mark-bowl {
-  fill: currentColor;
-}
-
 .site-header .wordmark-text {
   display: none;
 }

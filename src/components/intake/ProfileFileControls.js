@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Download, Upload } from 'lucide-react';
+import { AlertCircle, Download, Upload } from 'lucide-react';
 import { downloadProfile, parseProfileFile, readFileAsText } from '../../lib/profileFile';
 import { useProfile } from '../../context/ProfileContext';
 
@@ -28,16 +28,19 @@ const ProfileFileControls = () => {
   };
 
   return (
-    <div className="profile-file-controls">
-      <button className="text-btn" onClick={() => downloadProfile(profile)}>
-        <Download size={16} />
-        Export my data
-      </button>
+    <div className="file-controls">
+      <p className="file-controls-note">Saved on this device only.</p>
+      <div className="file-controls-buttons">
+        <button className="btn btn-outline btn-small" onClick={() => downloadProfile(profile)}>
+          <Download size={15} aria-hidden="true" />
+          Export my data
+        </button>
 
-      <button className="text-btn" onClick={() => fileInput.current?.click()}>
-        <Upload size={16} />
-        Import
-      </button>
+        <button className="btn btn-outline btn-small" onClick={() => fileInput.current?.click()}>
+          <Upload size={15} aria-hidden="true" />
+          Import
+        </button>
+      </div>
 
       <input
         ref={fileInput}
@@ -48,7 +51,12 @@ const ProfileFileControls = () => {
         aria-label="Import a profile file"
       />
 
-      {error && <p className="import-error" role="alert">{error}</p>}
+      {error && (
+        <p className="notice notice-danger file-controls-error" role="alert">
+          <AlertCircle size={16} aria-hidden="true" />
+          <span>{error}</span>
+        </p>
+      )}
     </div>
   );
 };
