@@ -15,6 +15,7 @@
     'main'
     'foot';
   grid-template-columns: minmax(0, 1fr);
+  align-content: start;
   min-height: 100vh;
   min-height: 100dvh;
   background: var(--color-bg);

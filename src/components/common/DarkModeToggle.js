@@ -2,7 +2,7 @@ import React from 'react';
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 
-const DarkModeToggle = ({ className = 'dark-mode-toggle', size = 20 }) => {
+const DarkModeToggle = ({ className = 'icon-btn', size = 20 }) => {
   const { darkMode, toggleDarkMode } = useTheme();
 
   return (

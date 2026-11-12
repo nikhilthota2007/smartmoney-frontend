@@ -1,7 +1,8 @@
 import React from 'react';
-import { Activity, Send } from 'lucide-react';
+import { ArrowUp } from 'lucide-react';
 
-const ChatInput = ({ value, onChange, onSend, loading, onShowHealthScore }) => {
+/** The composer: one pill, the send button inside it. */
+const ChatInput = ({ value, onChange, onSend, loading, inputRef }) => {
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -10,29 +11,30 @@ const ChatInput = ({ value, onChange, onSend, loading, onShowHealthScore }) => {
   };
 
   return (
-    <div className="input-area">
-      <button className="health-score-btn" onClick={onShowHealthScore}>
-        <Activity size={18} />
-        Want to know your Financial Health Score? Click here
-      </button>
-
-      <div className="input-row">
+    <div className="composer">
+      <div className="composer-pill">
+        <label htmlFor="chat-input" className="visually-hidden">
+          Your question
+        </label>
         <input
+          id="chat-input"
+          ref={inputRef}
           type="text"
-          className="chat-input"
+          className="composer-input"
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Ask me about saving money, budgeting, or your financial goals..."
+          placeholder="Ask me about saving money…"
+          autoComplete="off"
           disabled={loading}
         />
         <button
-          className="send-btn"
+          className="composer-send"
           aria-label="Send message"
           onClick={onSend}
           disabled={loading || !value.trim()}
         >
-          <Send size={20} />
+          <ArrowUp size={18} aria-hidden="true" />
         </button>
       </div>
     </div>
