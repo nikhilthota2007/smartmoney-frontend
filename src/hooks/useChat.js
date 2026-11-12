@@ -5,7 +5,7 @@ import { toFinancialData } from '../lib/profile';
 import { executeTool } from '../lib/tools';
 
 export const GREETING =
-  "Hello! I'm your AI financial advisor. I have your financial information and I'm here to help you save money and achieve your goals. What would you like to know?";
+  "Hey. I've got your numbers in front of me, and nothing in them scares me. Ask me anything: debt, savings, whether you can afford the thing. I'll run the math and tell you straight.";
 
 /**
  * How many times we will run tools and go back to the model for one question.

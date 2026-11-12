@@ -1,6 +1,24 @@
 /** Presentation helpers. No financial logic lives here. */
 
-export const formatCurrency = (amount) => `$${Number(amount).toFixed(2)}`;
+const dollars = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
+});
+const dollarsAndCents = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+/** "$5,000" for whole dollars, "$1,234.50" when there are cents. */
+export const formatCurrency = (amount) => {
+  const value = Number(amount);
+  const wholeDollars = Math.round(value * 100) % 100 === 0;
+  return (wholeDollars ? dollars : dollarsAndCents).format(value);
+};
 
 const plural = (count, noun) => `${count} ${noun}${count > 1 ? 's' : ''}`;
 

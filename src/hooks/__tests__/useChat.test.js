@@ -115,7 +115,7 @@ describe('a turn that needs a calculation', () => {
     expect(messages.some((m) => m.role === 'tool')).toBe(true);
     expect(visible.some((m) => m.role === 'tool')).toBe(false);
     expect(visible.map((m) => m.content)).toEqual([
-      expect.stringContaining('AI financial advisor'),
+      expect.stringContaining("I've got your numbers"),
       'Project it',
       'Here you go.',
     ]);

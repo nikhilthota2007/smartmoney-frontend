@@ -33,7 +33,7 @@ describe('intake wizard', () => {
 
     expect(screen.getByRole('heading', { name: 'SmartMoney' })).toBeInTheDocument();
     expect(screen.getByText('0% complete')).toBeInTheDocument();
-    expect(screen.getByText(/add your income/i)).toBeInTheDocument();
+    expect(screen.getByText(/start with your income/i)).toBeInTheDocument();
   });
 
   it('offers every step and lets the user jump between them', () => {
@@ -118,7 +118,7 @@ describe('chat', () => {
     render(<App />);
     startChat();
 
-    expect(screen.getByText(/I'm your AI financial advisor/)).toBeInTheDocument();
+    expect(screen.getByText(/I've got your numbers in front of me/)).toBeInTheDocument();
     expect(screen.getByText('Try asking:')).toBeInTheDocument();
   });
 
@@ -153,9 +153,9 @@ describe('chat', () => {
     expect(screen.getByText(/% complete/)).toBeInTheDocument();
 
     startChat();
-    expect(screen.getByText(/I'm your AI financial advisor/)).toBeInTheDocument();
+    expect(screen.getByText(/I've got your numbers in front of me/)).toBeInTheDocument();
     // One greeting, not two — re-entering must not restart the conversation.
-    expect(screen.getAllByText(/I'm your AI financial advisor/)).toHaveLength(1);
+    expect(screen.getAllByText(/I've got your numbers in front of me/)).toHaveLength(1);
   });
 });
 
@@ -220,7 +220,7 @@ describe('debt payoff calculator', () => {
     expect(screen.getByText('Debt Avalanche')).toBeInTheDocument();
     expect(screen.getByText('Debt Snowball')).toBeInTheDocument();
     expect(screen.getByText('Smart Payment Plan')).toBeInTheDocument();
-    expect(screen.getByText('$5000.00')).toBeInTheDocument();
+    expect(screen.getByText('$5,000')).toBeInTheDocument();
   });
 
   it('warns when a minimum payment never covers the interest', () => {
@@ -263,7 +263,7 @@ describe('debt payoff calculator', () => {
     openCalculator();
 
     expect(screen.getByDisplayValue('Car Loan')).toBeInTheDocument();
-    expect(screen.getByText('$15000.00')).toBeInTheDocument();
+    expect(screen.getByText('$15,000')).toBeInTheDocument();
   });
 
   it('keeps the extra payment when closed and reopened', () => {

@@ -1,9 +1,19 @@
 import { formatCurrency, formatDuration } from '../format';
 
 describe('formatCurrency', () => {
-  it('always shows two decimal places', () => {
-    expect(formatCurrency(1234.5)).toBe('$1234.50');
-    expect(formatCurrency(0)).toBe('$0.00');
+  it('groups thousands and shows cents only when there are some', () => {
+    expect(formatCurrency(1234.5)).toBe('$1,234.50');
+    expect(formatCurrency(5000)).toBe('$5,000');
+    expect(formatCurrency(0)).toBe('$0');
+  });
+
+  it('rounds to the cent before deciding', () => {
+    expect(formatCurrency(41.666)).toBe('$41.67');
+    expect(formatCurrency(99.999)).toBe('$100');
+  });
+
+  it('puts the sign before the dollar sign', () => {
+    expect(formatCurrency(-250)).toBe('-$250');
   });
 });
 

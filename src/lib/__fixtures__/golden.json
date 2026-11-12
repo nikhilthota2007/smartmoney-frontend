@@ -183,31 +183,31 @@
   },
   "improvementTips": {
     "typical": [
-      "Build emergency fund: Currently 2.9 months of expenses, target 6 months"
+      "Your savings would cover 2.9 months of expenses. Six is the target; three is a solid first milestone."
     ],
     "highEarnerNoDebt": [
-      "Great work! Keep maintaining these healthy financial habits."
+      "This is in good shape. Keep doing exactly what you are doing."
     ],
     "deficit": [
-      "Increase your savings rate: Currently saving -26.7%, aim for 15-20%",
-      "Reduce debt: Current debt is 61.1% of annual income, target below 20%",
-      "Build emergency fund: Currently 0.1 months of expenses, target 6 months"
+      "More goes out than comes in: about 26.7% of your income each month. Closing that gap comes before anything else.",
+      "Your debt is 61.1% of a year's income. Getting it under 20% takes real pressure off.",
+      "Your savings would cover 0.1 months of expenses. Six is the target; three is a solid first milestone."
     ],
     "breakEven": [
-      "Increase your savings rate: Currently saving 0.0%, aim for 15-20%",
-      "Build emergency fund: Currently 0.0 months of expenses, target 6 months"
+      "You keep 0.0% of what you earn. Nudging that toward 15–20% is the biggest lever you have.",
+      "Your savings would cover 0.0 months of expenses. Six is the target; three is a solid first milestone."
     ],
     "zeroIncome": null,
     "emptyStrings": null,
     "noExpenses": [
-      "Build emergency fund: Currently 0.0 months of expenses, target 6 months"
+      "Your savings would cover 0.0 months of expenses. Six is the target; three is a solid first milestone."
     ],
     "thinMargin": [
-      "Increase your savings rate: Currently saving 5.0%, aim for 15-20%",
-      "Build emergency fund: Currently 3.0 months of expenses, target 6 months"
+      "You keep 5.0% of what you earn. Nudging that toward 15–20% is the biggest lever you have.",
+      "Your savings would cover 3.0 months of expenses. Six is the target; three is a solid first milestone."
     ],
     "heavyDebt": [
-      "Reduce debt: Current debt is 111.1% of annual income, target below 20%"
+      "Your debt is 111.1% of a year's income. Getting it under 20% takes real pressure off."
     ]
   },
   "recommendedPayment": {

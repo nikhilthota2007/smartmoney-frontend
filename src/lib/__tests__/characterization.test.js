@@ -37,6 +37,9 @@ describe('getScoreRating', () => {
   });
 });
 
+// golden.improvementTips was regenerated when the tips were reworded for the
+// redesign. Only the wording changed: which tips appear, and the figures in
+// them, still match the original implementation.
 describe('getImprovementTips', () => {
   Object.entries(cases.profiles).forEach(([name, profile]) => {
     const expected = golden.improvementTips[name];

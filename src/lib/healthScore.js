@@ -51,16 +51,21 @@ export const getScoreRating = (score) => {
 export const getImprovementTips = (healthData) => {
   const tips = [];
   if (healthData.savingsRate.score < 30) {
-    tips.push(`Increase your savings rate: Currently saving ${healthData.savingsRate.value.toFixed(1)}%, aim for 15-20%`);
+    const rate = healthData.savingsRate.value;
+    tips.push(
+      rate < 0
+        ? `More goes out than comes in: about ${Math.abs(rate).toFixed(1)}% of your income each month. Closing that gap comes before anything else.`
+        : `You keep ${rate.toFixed(1)}% of what you earn. Nudging that toward 15–20% is the biggest lever you have.`
+    );
   }
   if (healthData.debtRatio.score < 20 && healthData.debtRatio.value > 0) {
-    tips.push(`Reduce debt: Current debt is ${healthData.debtRatio.value.toFixed(1)}% of annual income, target below 20%`);
+    tips.push(`Your debt is ${healthData.debtRatio.value.toFixed(1)}% of a year's income. Getting it under 20% takes real pressure off.`);
   }
   if (healthData.emergencyFund.score < 20) {
-    tips.push(`Build emergency fund: Currently ${healthData.emergencyFund.value.toFixed(1)} months of expenses, target 6 months`);
+    tips.push(`Your savings would cover ${healthData.emergencyFund.value.toFixed(1)} months of expenses. Six is the target; three is a solid first milestone.`);
   }
   if (tips.length === 0) {
-    tips.push('Great work! Keep maintaining these healthy financial habits.');
+    tips.push('This is in good shape. Keep doing exactly what you are doing.');
   }
   return tips;
 };
