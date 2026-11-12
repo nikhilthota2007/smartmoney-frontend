@@ -28,53 +28,6 @@
   --coral-700: #c4432a;
   --white: #ffffff;
 
-  /* ---------- Colour roles: light ---------- */
-  color-scheme: light;
-
-  --color-bg: var(--white);
-  --color-surface: var(--oat-100);
-  --color-sunken: var(--oat-200);
-  --color-raised: var(--white);
-  --color-raised-hover: var(--oat-50);
-
-  --color-text: var(--pine-700);
-  --color-muted: rgb(22 59 53 / 0.7);
-  --color-faint: rgb(22 59 53 / 0.45);
-  --color-line: rgb(22 59 53 / 0.12);
-  --color-line-strong: rgb(22 59 53 / 0.2);
-  --color-border: rgb(22 59 53 / 0.56);
-
-  --color-accent: var(--coral-500);
-  --color-on-accent: var(--pine-700);
-  --color-accent-strong: var(--coral-700);
-  --color-accent-soft: var(--coral-200);
-  --color-accent-glow: rgb(255 122 92 / 0.28);
-
-  --color-primary: var(--pine-700);
-  --color-primary-hover: var(--pine-500);
-  --color-on-primary: var(--white);
-
-  --color-success: #17754b;
-  --color-success-soft: #dff2e6;
-  --color-warning: #8f5a00;
-  --color-warning-soft: #fff0cc;
-  --color-danger: #b4233a;
-  --color-danger-soft: #fce4e7;
-
-  --color-focus: var(--pine-700);
-  --color-scrim: rgb(11 24 21 / 0.48);
-  --color-shadow: rgb(11 24 21 / 0.1);
-  --color-shadow-strong: rgb(11 24 21 / 0.16);
-
-  /* The glass button (landing). */
-  --glass-fill: rgb(134 134 134 / 0.1);
-  --glass-fill-hover: rgb(248 246 242 / 0.25);
-  --glass-inner: rgb(255 255 255 / 0.2);
-  --glass-inner-border: rgb(255 255 255 / 0.3);
-  --glass-ring-light: #f8f6f2;
-  --glass-ring-dark: #868686;
-  --glass-text: var(--pine-700);
-
   /* ---------- Hero artwork (fixed in both themes) ---------- */
   --art-night: #0c1f1c;
   --art-sky-top: #10292a;
@@ -90,7 +43,6 @@
   --art-ridge-haze: #7f9d92;
   --art-hill: #2c5b52;
   --art-hill-dark: #1f4a42;
-  --art-path: #f6c9a4;
   --art-ground: #12302b;
   --art-ground-deep: #0c241f;
   --art-grass: #1b4038;
@@ -98,6 +50,11 @@
   --art-glass-hi: #3c5254;
   --art-text: var(--white);
   --art-glint: rgb(255 240 220 / 0.9);
+  --art-chip-fill: rgb(255 255 255 / 0.14);
+  --art-chip-fill-hover: rgb(255 255 255 / 0.24);
+  --art-chip-line: rgb(255 255 255 / 0.32);
+  --art-glass-reflect: rgb(178 200 204 / 0.22);
+  --art-text-shadow: rgb(6 16 14 / 0.35);
 
   /* The phone */
   --device-frame-hi: #e8e6e1;
@@ -185,6 +142,59 @@
   --z-sheet: 100;
 }
 
+/* ---------- Colour roles: light ----------
+ * .theme-light re-applies them to a subtree that must stay light in either
+ * theme (the phone screen on the landing page is artwork of the app). */
+:root,
+.theme-light {
+  color-scheme: light;
+
+  --color-bg: var(--white);
+  --color-surface: var(--oat-100);
+  --color-sunken: var(--oat-200);
+  --color-raised: var(--white);
+  --color-raised-hover: var(--oat-50);
+
+  --color-text: var(--pine-700);
+  --color-muted: rgb(22 59 53 / 0.7);
+  --color-faint: rgb(22 59 53 / 0.45);
+  --color-line: rgb(22 59 53 / 0.12);
+  --color-line-strong: rgb(22 59 53 / 0.2);
+  --color-border: rgb(22 59 53 / 0.56);
+
+  --color-accent: var(--coral-500);
+  --color-on-accent: var(--pine-700);
+  --color-accent-strong: var(--coral-700);
+  --color-accent-soft: var(--coral-200);
+  --color-accent-glow: rgb(255 122 92 / 0.28);
+  --color-sweep-faint: rgb(22 59 53 / 0.18);
+
+  --color-primary: var(--pine-700);
+  --color-primary-hover: var(--pine-500);
+  --color-on-primary: var(--white);
+
+  --color-success: #17754b;
+  --color-success-soft: #dff2e6;
+  --color-warning: #8f5a00;
+  --color-warning-soft: #fff0cc;
+  --color-danger: #b4233a;
+  --color-danger-soft: #fce4e7;
+
+  --color-focus: var(--pine-700);
+  --color-scrim: rgb(11 24 21 / 0.48);
+  --color-shadow: rgb(11 24 21 / 0.1);
+  --color-shadow-strong: rgb(11 24 21 / 0.16);
+
+  /* The glass button (landing). */
+  --glass-fill: rgb(134 134 134 / 0.1);
+  --glass-fill-hover: rgb(248 246 242 / 0.25);
+  --glass-inner: rgb(255 255 255 / 0.2);
+  --glass-inner-border: rgb(255 255 255 / 0.3);
+  --glass-ring-light: #f8f6f2;
+  --glass-ring-dark: #868686;
+  --glass-text: var(--pine-700);
+}
+
 @media (min-width: 768px) {
   :root {
     --gutter: 32px;
@@ -215,6 +225,7 @@ body.dark-mode,
   --color-accent-strong: var(--coral-300);
   --color-accent-soft: rgb(255 139 112 / 0.16);
   --color-accent-glow: rgb(255 139 112 / 0.14);
+  --color-sweep-faint: rgb(243 239 230 / 0.18);
 
   --color-primary: var(--cream-100);
   --color-primary-hover: var(--white);
@@ -245,6 +256,7 @@ body.dark-mode,
  * Declared on every element that can switch theme, so var(--color-shadow)
  * resolves against that element's theme rather than :root's. */
 :root,
+.theme-light,
 body.dark-mode,
 [data-theme='dark'] {
   --shadow-sm: 0 1px 2px var(--color-shadow);

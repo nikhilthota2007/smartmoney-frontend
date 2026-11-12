@@ -17,6 +17,14 @@ export const monthLabel = (months, today = new Date()) =>
 export const duration = (months) =>
   months <= 0 ? 'Under a month' : formatDuration(Math.floor(months / 12), months % 12);
 
+/** Theme tone for a health-score rating name (the library's own colours are hex). */
+export const RATING_TONE = {
+  Excellent: 'success',
+  Good: 'success',
+  Fair: 'warning',
+  'Needs Improvement': 'danger',
+};
+
 /** Short form for tight spaces: "25 mo" or "6 yrs". */
 export const shortDuration = (months) => {
   if (months < 24) return `${months} mo`;
