@@ -19,10 +19,13 @@ const { geminiFromRequest, userKeyMessage } = require('./_lib/userKey.js');
 /** What the client is told when the upstream call fails. Details stay in the logs. */
 const GENERIC_ERROR = 'The advisor is temporarily unavailable. Please try again in a moment.';
 
-const failure = (res) => res.status(200).json({
+/** The shared model's per-minute limit: common, harmless, and worth saying plainly. */
+const RATE_LIMITED = "I'm getting a lot of questions right now. Try again in a minute.";
+
+const failure = (res, error = GENERIC_ERROR) => res.status(200).json({
   response: null,
   success: false,
-  error: GENERIC_ERROR,
+  error,
 });
 
 module.exports = async function handler(req, res) {
@@ -55,6 +58,7 @@ module.exports = async function handler(req, res) {
       // that distinction is invisible from the browser, which sees the same
       // generic error for all of them.
       console.error('Groq rejected the request', { status: error.status, body: error.body });
+      if (error.status === 429) return failure(res, RATE_LIMITED);
     } else {
       // Error messages can carry upstream URLs, keys and internal state, so they
       // are logged rather than returned to the browser.
@@ -65,3 +69,4 @@ module.exports = async function handler(req, res) {
 };
 
 module.exports.GENERIC_ERROR = GENERIC_ERROR;
+module.exports.RATE_LIMITED = RATE_LIMITED;

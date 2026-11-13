@@ -42,6 +42,9 @@ module.exports = async function handler(req, res) {
     }
     if (error instanceof GroqError) {
       console.error('Groq rejected the categorisation', { status: error.status, body: error.body });
+      if (error.status === 429) {
+        return res.status(200).json({ success: false, error: "I'm getting a lot of questions right now. Try again in a minute." });
+      }
     } else {
       console.error('Categorisation failed', error);
     }

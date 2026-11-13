@@ -96,7 +96,9 @@ Those functions are a port of the Java service in
 [smartmoney-backend](https://github.com/nikhilthota2007/smartmoney-backend),
 which still builds and runs. Both send the same prompt: `api/_lib/prompts/` and
 `api/_lib/tools/` are byte-identical copies of the backend's resources, and the
-port was verified against the Java original before it replaced it. **Edit the
+port was verified against the Java original before it replaced it. Since prompt v7 (SmartMoney's voice, and sections for the latest statement and
+the plan on screen), this repository's prompt and `picture.js` are ahead of the
+Java backend's. **Edit the
 prompt or the tool schemas in both places, or the two deployments will disagree
 about what the advisor is told.**
 
@@ -179,7 +181,7 @@ with amounts and no dates, after the user has seen them.
 `GET /api/health` reports what a deployment is actually running:
 
 ```
-Financial Advisor API is running! model=openai/gpt-oss-120b prompt=v4 tools=v1 key=configured [simulate_debt_payoff, evaluate_goal, project_savings]
+Financial Advisor API is running! model=openai/gpt-oss-120b prompt=v7 tools=v1 key=configured [simulate_debt_payoff, evaluate_goal, project_savings]
 ```
 
 That line is the first thing to check when the advisor reports itself

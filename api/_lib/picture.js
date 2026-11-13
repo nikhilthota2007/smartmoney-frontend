@@ -145,6 +145,79 @@ const appendMissing = (out, missingSections, completenessPct) => {
   out.push('');
 };
 
+/**
+ * The latest statement, as the client summarised it: derived figures and
+ * merchant names only. Strings are scrubbed again here (emails, long digit
+ * runs, line breaks) and every list is capped, whatever the client sent.
+ */
+const clean = (value, max = 160) =>
+  String(value ?? '')
+    .replace(/[\w.+-]+@[\w-]+\.[\w.-]+/g, '')
+    .replace(/\d{6,}/g, '#')
+    .replace(/[\r\n]+/g, ' ')
+    .trim()
+    .slice(0, max);
+
+const isNumber = (value) => typeof value === 'number' && Number.isFinite(value);
+const list = (value, max) => (Array.isArray(value) ? value.slice(0, max) : []);
+const named = (item, field = 'name') => `${clean(item[field], 40)} ${money(item.amount)}`;
+const monthsText = (months) => `${months} month${months === 1 ? '' : 's'}`;
+
+const appendStatement = (out, statement) => {
+  if (!statement || typeof statement !== 'object') return;
+  out.push('LATEST STATEMENT (read and sorted by the app; quote these, do not recompute them)');
+  const period = statement.period || {};
+  if (!blank(period.start) && !blank(period.end)) {
+    out.push(`  Period: ${clean(period.start, 10)} to ${clean(period.end, 10)}${isNumber(statement.transactionCount) ? `, ${statement.transactionCount} transactions` : ''}`);
+  }
+  if (isNumber(statement.totalSpent)) out.push(`  Total spent: ${money(statement.totalSpent)}`);
+
+  const categories = list(statement.categories, 12).filter((item) => isNumber(item.amount));
+  if (categories.length) out.push(`  By category: ${categories.map((item) => named(item)).join('; ')}`);
+
+  const subscriptions = list(statement.subscriptions, 20).filter((item) => isNumber(item.amount));
+  if (subscriptions.length) {
+    const total = subscriptions.reduce((sum, item) => sum + item.amount, 0);
+    out.push(`  Subscriptions (${subscriptions.length}, ${money(total)} in all), biggest first: ${subscriptions.map((item) => named(item)).join('; ')}`);
+  }
+
+  const fees = list(statement.feesAndInterest, 10).filter((item) => isNumber(item.amount));
+  if (fees.length) out.push(`  Interest and fees: ${fees.map((item) => named(item)).join('; ')}`);
+
+  const duplicates = list(statement.possibleDuplicates, 5).filter((item) => isNumber(item.amount));
+  if (duplicates.length) {
+    out.push(`  Possible duplicate charges: ${duplicates.map((item) => `${clean(item.merchant, 40)} ${money(item.amount)} x${Number(item.count) || 2} on ${clean(item.date, 10)}`).join('; ')}`);
+  }
+
+  const fixes = list(statement.fixes, 8);
+  if (fixes.length) {
+    out.push(`  Fixes the app found${isNumber(statement.fixesMonthlyTotal) ? ` (${money(statement.fixesMonthlyTotal)}/mo of savings in all)` : ''}:`);
+    fixes.forEach((fix) => {
+      const value = isNumber(fix.refund) ? `${money(fix.refund)} back` : isNumber(fix.monthlySaving) ? `${money(fix.monthlySaving)}/mo` : '';
+      out.push(`    - ${clean(fix.title, 60)}${value ? `: ${value}` : ''}. ${clean(fix.detail)}`);
+    });
+  }
+  out.push('');
+
+  const plan = statement.plan;
+  if (plan && isNumber(plan.extraPayment) && isNumber(plan.months)) {
+    out.push('PLAN ON SCREEN (the user sees this plan; use it, and do not offer a different payment plan unless they ask)');
+    const basis = plan.basis === 'budget' && isNumber(plan.monthlySurplus)
+      ? `sized from the ${money(plan.monthlySurplus)} monthly surplus`
+      : "funded by the fixes, because spending and bills use up what comes in";
+    const result = plan.clears === false ? 'not cleared within the 50-year projection' : `debt-free in ${monthsText(plan.months)}, ${money(plan.totalInterest)} total interest`;
+    out.push(`  ${money(plan.extraPayment)}/mo extra toward debt, ${basis}: ${result}`);
+    if (plan.minimumsNeverClear === true) {
+      out.push('  On minimum payments alone the debt never gets paid off; there is no "months sooner" comparison.');
+    }
+    const boost = plan.withFixes;
+    if (boost && isNumber(boost.extraPayment) && isNumber(boost.months) && boost.clears !== false) {
+      out.push(`  With the fixes added (${money(boost.extraPayment)}/mo extra): debt-free in ${monthsText(boost.months)}, ${money(boost.totalInterest)} total interest`);
+    }
+    out.push('');
+  }
+};
+
 const renderHeadlineFiguresOnly = (data) => {
   const safe = data || {};
   return [
@@ -168,6 +241,7 @@ const renderFinancialPicture = (context, data) => {
   appendDebts(out, context.debts);
   appendPayoff(out, context.debtPayoff);
   appendGoals(out, context.goals);
+  appendStatement(out, context.statement);
   appendList(out, 'COVERAGE GAPS', context.protectionGaps);
   appendMissing(out, context.missing, context.completenessPct);
 

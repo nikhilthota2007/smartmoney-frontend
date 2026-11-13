@@ -22,6 +22,12 @@ describe('formatMessage', () => {
     expect(screen.getByText('Then the store card')).toBeInTheDocument();
   });
 
+  it('reads ***bold italic*** as bold, not as a bullet and a stray asterisk', () => {
+    show('Here is the order.\n***Why this order?***\nBiggest first.');
+    expect(screen.getByText('Why this order?').tagName).toBe('STRONG');
+    expect(screen.queryByText(/\*/)).not.toBeInTheDocument();
+  });
+
   it('leaves a lone asterisk alone', () => {
     show('Rates * vary');
     expect(screen.getByText('Rates * vary')).toBeInTheDocument();

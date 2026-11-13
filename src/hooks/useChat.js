@@ -30,8 +30,9 @@ export const visibleMessages = (messages) => messages.filter((message) => !isInt
  *
  * The financial context is rebuilt on every send rather than held in state, so
  * a figure the user edits mid-conversation is reflected in the very next answer.
+ * `extraContext`, when given, is merged into it (the statement brief).
  */
-export const useChat = (profile) => {
+export const useChat = (profile, { extraContext = null } = {}) => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -61,7 +62,9 @@ export const useChat = (profile) => {
       let history = [...messages, userMessage];
       const request = {
         financialData: toFinancialData(profile),
-        financialContext: buildAdvisorContext(profile),
+        // extraContext adds derived sections the profile alone cannot give
+        // (the latest statement's analysis); the profile's context is unchanged.
+        financialContext: extraContext ? { ...buildAdvisorContext(profile), ...extraContext } : buildAdvisorContext(profile),
       };
 
       try {
@@ -101,7 +104,12 @@ export const useChat = (profile) => {
           ...previous,
           {
             role: 'assistant',
-            content: `Sorry, I encountered an error: ${error.message}. Please try again in a moment.`,
+            // A message the server wrote for the user already says what to do;
+            // wrapping it again repeated "Please try again in a moment" twice.
+            content: error.userFacing
+              ? error.message
+              : `Sorry, I encountered an error: ${error.message}. Please try again in a moment.`,
+            error: true,
           },
         ]);
       } finally {
@@ -109,7 +117,7 @@ export const useChat = (profile) => {
         setLoading(false);
       }
     },
-    [profile, input, loading, messages]
+    [profile, input, loading, messages, extraContext]
   );
 
   return {

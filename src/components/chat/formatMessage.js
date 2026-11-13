@@ -1,13 +1,16 @@
 import React from 'react';
 
 /** **bold** and *italic*, the two the model actually uses. */
-const INLINE = /(\*\*[^*\n]+\*\*|\*[^*\s][^*\n]*\*)/g;
+const INLINE = /(\*\*\*[^*\n]+\*\*\*|\*\*[^*\n]+\*\*|\*[^*\s][^*\n]*\*)/g;
 
 const renderInline = (content, renderText) =>
   content
     .split(INLINE)
     .filter(Boolean)
     .map((part, index) => {
+      if (part.length > 6 && part.startsWith('***') && part.endsWith('***')) {
+        return <strong key={index}>{renderText(part.slice(3, -3))}</strong>;
+      }
       if (part.length > 4 && part.startsWith('**') && part.endsWith('**')) {
         return <strong key={index}>{renderText(part.slice(2, -2))}</strong>;
       }
@@ -34,7 +37,8 @@ const formatMessage = (text, renderText = (content) => content) => {
       let currentText = [];
 
       lines.forEach((line) => {
-        if (line.trim().startsWith('*') || line.trim().startsWith('-')) {
+        // "* item" or "- item"; a line that opens with **bold** is not a bullet.
+        if (/^[*-]\s/.test(line.trim())) {
           if (currentText.length > 0) {
             listItems.push({ type: 'text', content: currentText.join(' ') });
             currentText = [];

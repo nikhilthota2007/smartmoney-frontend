@@ -1,6 +1,9 @@
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useMemo } from 'react';
 import { useChat } from '../hooks/useChat';
 import { useProfile } from '../context/ProfileContext';
+import { useStatement } from './StatementContext';
+import { statementBrief } from '../lib/statement/brief';
+import { debtPlan } from '../lib/statement/plan';
 
 /**
  * Holds the conversation above the screens, so leaving the advisor (for the
@@ -11,7 +14,14 @@ const ChatSessionContext = createContext(null);
 
 export const ChatSessionProvider = ({ children }) => {
   const { profile } = useProfile();
-  const chat = useChat(profile);
+  const { analysis } = useStatement();
+  // What the page shows about the statement, so the advisor can talk about
+  // the same subscriptions, fixes and plan instead of asking for them.
+  const extraContext = useMemo(
+    () => (analysis ? { statement: statementBrief(analysis, debtPlan(profile, analysis.monthlySaving)) } : null),
+    [analysis, profile]
+  );
+  const chat = useChat(profile, { extraContext });
   return <ChatSessionContext.Provider value={chat}>{children}</ChatSessionContext.Provider>;
 };
 

@@ -204,6 +204,17 @@
   font-weight: var(--weight-regular);
 }
 
+.impact-sub,
+.impact-boost {
+  font-size: var(--text-small);
+  color: var(--color-muted);
+}
+
+.impact-boost strong {
+  color: var(--color-text);
+  font-weight: var(--weight-semibold);
+}
+
 .impact .tool-card {
   max-width: none;
 }

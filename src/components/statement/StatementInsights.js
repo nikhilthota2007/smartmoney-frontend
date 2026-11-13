@@ -6,10 +6,13 @@ import { executeTool } from '../../lib/tools';
 import { deriveSummary } from '../../lib/profile';
 import { deriveMetrics } from '../../lib/derive';
 import { filterValidDebts } from '../../lib/planner/debt';
+import { findUnpayableDebts } from '../../lib/planner/debtWarnings';
+import { debtPlan } from '../../lib/statement/plan';
 import PayoffCard from '../cards/PayoffCard';
 import GoalCard from '../cards/GoalCard';
 import ProjectionCard from '../cards/ProjectionCard';
-import { money } from '../cards/display';
+import { money, monthLabel } from '../cards/display';
+import { formatCurrency } from '../../lib/format';
 
 const shortDate = (iso) =>
   iso ? new Date(`${iso}T12:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
@@ -67,40 +70,71 @@ export const FixesCard = ({ analysis }) => (
         <Wand2 size={14} aria-hidden="true" />
         {analysis.fixes.length === 1 ? 'One fix' : `${analysis.fixes.length} fixes`}
       </span>
-      <span className="chip chip-success tabular">+{money(analysis.monthlySaving)}/mo</span>
+      {analysis.monthlySaving > 0 && (
+        <span className="chip chip-success tabular">+{money(analysis.monthlySaving)}/mo</span>
+      )}
     </header>
     <ol className="fix-list">
       {analysis.fixes.map((fix) => (
         <li key={fix.id}>
           <div className="fix-head">
             <span className="fix-title">{fix.title}</span>
-            <span className="fix-saving tabular">
-              <ArrowDownRight size={14} aria-hidden="true" />
-              {money(fix.saving)}/mo
-            </span>
+            {fix.kind === 'refund' ? (
+              <span className="fix-saving tabular">{formatCurrency(fix.refund)} back</span>
+            ) : (
+              <span className="fix-saving tabular">
+                <ArrowDownRight size={14} aria-hidden="true" />
+                {money(fix.saving)}/mo
+              </span>
+            )}
           </div>
           <p className="fix-detail">{fix.detail}</p>
         </li>
       ))}
     </ol>
-    <p className="card-foot">Estimates from this statement. The late-fee one is exact; the rest assume the cut described.</p>
+    <p className="card-foot">
+      From this statement. Duplicate charges and late fees are exact; the rest assume the cut described.
+    </p>
   </article>
 );
 
 /** What the freed-up money does for the user's goal, from the real tools. */
+/**
+ * The debt plan: the same one the advisor is given (lib/statement/plan.js),
+ * sized from the same surplus, with the fixes as an optional boost.
+ */
+const DebtPlanCard = ({ saving }) => {
+  const { profile } = useProfile();
+  const plan = debtPlan(profile, saving);
+  if (!plan || !plan.basis || !plan.result) return null;
+  const unpayable = findUnpayableDebts(profile.debts);
+  const boost = plan.withFixes && plan.withFixes.result;
+  const sooner = boost ? plan.result.avalanche.months - boost.avalanche.months : 0;
+
+  return (
+    <div className="impact">
+      <h3 className="impact-title">Your plan: {money(plan.extraPayment)} a month extra toward your debt</h3>
+      <p className="impact-sub">
+        {plan.basis === 'budget'
+          ? `Sized from the ${money(plan.monthlySurplus)} left each month after spending and bills.`
+          : "Spending and bills use up what comes in right now, so the fixes above are what fund it."}
+      </p>
+      <PayoffCard result={plan.result} unpayable={unpayable} />
+      {boost && boost.avalanche.clearsWithinProjection && sooner > 0 && (
+        <p className="impact-boost">
+          Make the fixes too and add their {money(saving)} a month: debt-free by{' '}
+          <strong>{monthLabel(boost.avalanche.months)}</strong>, {sooner} {sooner === 1 ? 'month' : 'months'} sooner.
+        </p>
+      )}
+    </div>
+  );
+};
+
 const ImpactCard = ({ saving }) => {
   const { profile } = useProfile();
-  if (!(saving > 0)) return null;
 
-  if (filterValidDebts(profile.debts).length > 0) {
-    const result = executeTool('simulate_debt_payoff', { extraPayment: saving }, profile);
-    return result.error ? null : (
-      <div className="impact">
-        <h3 className="impact-title">Put the {money(saving)} toward your debt</h3>
-        <PayoffCard result={result} />
-      </div>
-    );
-  }
+  if (filterValidDebts(profile.debts).length > 0) return <DebtPlanCard saving={saving} />;
+  if (!(saving > 0)) return null;
 
   const goal = profile.goals.find((item) => Number(item.targetAmount) > 0);
   const metrics = deriveMetrics(deriveSummary(profile));

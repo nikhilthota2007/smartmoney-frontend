@@ -50,7 +50,7 @@ export const buildThread = (messages) => {
     // An assistant turn that only requested tools is internal.
     if (message.role === 'assistant' && !message.toolCalls) {
       const text = message.content || '';
-      items.push({ kind: text.startsWith(ERROR_PREFIX) ? 'error' : 'advisor', key: index, text });
+      items.push({ kind: message.error || text.startsWith(ERROR_PREFIX) ? 'error' : 'advisor', key: index, text });
     }
   });
 

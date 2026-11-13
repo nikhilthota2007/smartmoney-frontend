@@ -183,12 +183,14 @@ describe('analyzeSpending', () => {
   });
 
   it('proposes the late-fee fix first, then the biggest estimates', () => {
+    // Shopping is the Shopping bar alone ($148.08), not Shopping plus
+    // Personal care: the fix and the breakdown share one definition.
     expect(analysis.fixes.map((fix) => [fix.id, fix.saving])).toEqual([
       ['late-fee', 29],
       ['delivery', 90],
-      ['shopping', 50],
+      ['shopping', 35],
       ['subscriptions', 25],
     ]);
-    expect(analysis.monthlySaving).toBe(194);
+    expect(analysis.monthlySaving).toBe(179);
   });
 });

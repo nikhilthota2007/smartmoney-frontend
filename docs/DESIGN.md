@@ -601,3 +601,47 @@ sent to improve its products.
   had no live run during the build (no key was available); the Groq path was
   run live.
 
+## 14. Round three: fixes from the preview test
+
+Tested on the preview with a card statement ($4,701.40 at 24.99% APR, $95
+minimum), $3,200 a month and the goal "Get out of debt".
+
+1. **Payoff card against the 600-month cap.** When minimums alone never clear
+   a debt, the simulation stops at 600 months, so "months sooner" and "less
+   interest" were measured against that cut-off ("582 months sooner"). The card
+   now shows the existing never-paid-off warning instead of those comparisons.
+2. **Possible duplicate charges.** Same merchant, amount and day (order codes
+   ignored) become a fix: "$47.99 from Amazon on Oct 5, twice. If you only
+   bought it once, ask for a refund." Refunds are one-off, so they are never
+   counted as monthly savings.
+3. **Subscriptions** are found by our own category, by name or wording
+   (Chegg Study, Kindle Unlimited, "membership"…), or by the same merchant
+   charging the same amount on different dates (not for coffee, groceries and
+   other routine repeats). A detected subscription counts as one in the bars,
+   the fix and the profile.
+4. **One definition per figure.** Every fix quotes the same period total as
+   its bar; Shopping no longer quietly includes Personal care.
+5. **The advisor sees the statement.** The browser sends a brief (category
+   totals, subscriptions, fees and interest, possible duplicates, the fixes and
+   the plan) built from redacted descriptions; the server renders it as LATEST
+   STATEMENT and PLAN ON SCREEN, scrubbing strings again and capping lists.
+6. **One plan, one surplus.** Setup asks about bills not on the card (rent,
+   utilities, phone and internet, insurance; skippable). The plan card uses the
+   existing recommended extra payment, the same one in the advisor's context and
+   the calculator's Smart Payment Plan, sized from the same surplus; the fixes
+   are shown as an optional boost. If spending and bills already use up what
+   comes in, the fixes fund the plan instead (`src/lib/statement/plan.js`).
+7. **Voice.** Prompt v7: SmartMoney's voice, lead with the user's numbers, no
+   generic tip lists or how-to boilerplate, and the disclaimer as one short
+   clause only for big or hard-to-reverse decisions, never as an opener.
+8. **Errors.** A message the server wrote is shown once, as written; a Groq
+   rate limit says "I'm getting a lot of questions right now. Try again in a
+   minute."
+
+Checked live on the built-in model with a fictional statement built to match
+the test: asked which subscriptions to cancel, it ranked the eight it was given
+by name and amount and mentioned the duplicate; asked about the plan, it quoted
+the card's $350 a month, 13 months and $1,267 surplus. One loose end: it once
+described the fixes as shaving "a month or two" off where the context says
+three.
+

@@ -152,6 +152,16 @@
   animation: question-in 360ms var(--ease-snap) both;
 }
 
+.bills {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-1-5);
+  padding: var(--space-2);
+  border-radius: var(--radius-card);
+  background: var(--color-raised);
+}
+
+.bills .field-control,
 .goal-details .field-control,
 .field-hero .field-control {
   background: var(--color-raised);

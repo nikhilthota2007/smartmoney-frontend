@@ -152,7 +152,7 @@ describe('financial picture', () => {
 describe('system prompt', () => {
   it('drops the authoring notes above the marker', () => {
     expect(PROMPT_TEMPLATE).not.toContain('When editing:');
-    expect(PROMPT_TEMPLATE.startsWith('You are an expert personal financial advisor')).toBe(true);
+    expect(PROMPT_TEMPLATE.startsWith("You are SmartMoney's money advisor")).toBe(true);
   });
 
   it('substitutes the picture for the placeholder', () => {
@@ -174,7 +174,7 @@ describe('system prompt', () => {
 
   it('keeps the guardrails that make the advice safe to ship', () => {
     expect(PROMPT_TEMPLATE).toContain('EDUCATIONAL INFORMATION, NOT LICENSED ADVICE');
-    expect(PROMPT_VERSION).toBe('v6');
+    expect(PROMPT_VERSION).toBe('v7');
   });
 
   /**

@@ -8,6 +8,7 @@ import ProjectionCard from '../ProjectionCard';
 import ScoreDial from '../ScoreDial';
 import { goalVerdict, STRETCH_SHARE } from '../verdict';
 import { duration, money, monthLabel, shortDuration } from '../display';
+import { findUnpayableDebts } from '../../../lib/planner/debtWarnings';
 
 const TODAY = new Date(2026, 10, 12); // 12 Nov 2026
 
@@ -157,5 +158,38 @@ describe('ScoreDial', () => {
     render(<ScoreDial score={75} />);
     expect(screen.getByText('75')).toBeInTheDocument();
     expect(screen.getByText('out of 100')).toBeInTheDocument();
+  });
+});
+
+describe('PayoffCard when minimums never clear the debt', () => {
+  // $4,701.40 at 24.99% accrues about $97.91 a month against a $95 minimum.
+  const stuckProfile = {
+    ...profile,
+    income: [{ id: 1, source: 'Pay', netMonthly: '3200', stability: 'stable' }],
+    debts: [{ id: 1, name: 'Card', type: 'card', balance: '4701.40', interestRate: '24.99', minPayment: '95' }],
+  };
+  const result = executeTool('simulate_debt_payoff', { extraPayment: 150 }, stuckProfile);
+
+  it('is measured against the 600-month cap in the raw result', () => {
+    // The comparison the card used to show: "582 months sooner".
+    expect(result.avalanche.months + result.comparedToMinimumsOnly.monthsSaved).toBe(600);
+  });
+
+  it('shows the never-paid-off warning instead of months sooner and interest saved', () => {
+    render(<PayoffCard result={result} today={TODAY} unpayable={findUnpayableDebts(stuckProfile.debts)} />);
+    const card = screen.getByRole('article', { name: 'Payoff plan' });
+
+    expect(within(card).getByText(/Card never gets paid off at its minimum payment/)).toBeInTheDocument();
+    expect(within(card).queryByText('months sooner')).not.toBeInTheDocument();
+    expect(within(card).queryByText('less interest')).not.toBeInTheDocument();
+    expect(within(card).queryByText(String(result.comparedToMinimumsOnly.monthsSaved))).not.toBeInTheDocument();
+    expect(within(card).queryByText('Minimums only')).not.toBeInTheDocument();
+    // The plan itself still stands: the extra payment does clear it.
+    expect(within(card).getByText(monthLabel(result.avalanche.months, TODAY))).toBeInTheDocument();
+  });
+
+  it('still warns when the caller does not know which debt it is', () => {
+    render(<PayoffCard result={result} today={TODAY} />);
+    expect(screen.getByText(/On minimum payments alone, this never gets paid off/)).toBeInTheDocument();
   });
 });

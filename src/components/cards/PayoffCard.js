@@ -1,6 +1,8 @@
 import React from 'react';
 import { AlertTriangle, Calculator, CalendarCheck } from 'lucide-react';
 import { duration, money, monthLabel, shortDuration } from './display';
+import DebtWarnings from '../planning/DebtWarnings';
+import { PAYOFF_HORIZON_MONTHS } from '../../lib/planner/debtWarnings';
 
 const TimelineBar = ({ label, months, max, muted }) => (
   <div className="timeline">
@@ -20,14 +22,22 @@ const TimelineBar = ({ label, months, max, muted }) => (
 /**
  * A simulate_debt_payoff result: when the debt clears, what the extra payment
  * buys against minimums alone, and how the two timelines compare.
+ *
+ * When minimums alone never clear the debt, the simulation stops at its
+ * 600-month cap, so "months sooner" and "less interest" would be measured
+ * against an arbitrary cut-off ("582 months sooner"). Those comparisons are
+ * replaced by the never-paid-off warning. `unpayable` (from
+ * findUnpayableDebts) names the debts when the caller knows them.
  */
-const PayoffCard = ({ result, today = new Date(), className = '' }) => {
+const PayoffCard = ({ result, unpayable = [], today = new Date(), className = '' }) => {
   if (!result || result.error || !result.avalanche) return null;
 
   const { avalanche, snowball, comparedToMinimumsOnly: saved = {}, extraPayment = 0 } = result;
   const clears = avalanche.clearsWithinProjection !== false;
   const monthsSaved = saved.monthsSaved || 0;
   const baselineMonths = avalanche.months + monthsSaved;
+  const minimumsNeverClear = baselineMonths >= PAYOFF_HORIZON_MONTHS;
+  const compare = clears && !minimumsNeverClear;
   const snowballDiffers =
     snowball &&
     (snowball.months !== avalanche.months || Math.abs(snowball.totalInterest - avalanche.totalInterest) >= 1);
@@ -59,7 +69,20 @@ const PayoffCard = ({ result, today = new Date(), className = '' }) => {
         </div>
       )}
 
-      {clears && monthsSaved > 0 && (
+      {minimumsNeverClear &&
+        (unpayable.length > 0 ? (
+          <DebtWarnings unpayable={unpayable} hitsHorizon={false} />
+        ) : (
+          <div className="notice notice-warning" role="alert">
+            <AlertTriangle size={16} aria-hidden="true" />
+            <div>
+              <strong>On minimum payments alone, this never gets paid off.</strong>
+              The interest each month is more than the minimum, so the extra payment is what clears it.
+            </div>
+          </div>
+        ))}
+
+      {compare && monthsSaved > 0 && (
         <div className="stat-pair">
           <div className="stat">
             <span className="stat-value tabular" data-anim="count" data-value={monthsSaved}>
@@ -76,7 +99,7 @@ const PayoffCard = ({ result, today = new Date(), className = '' }) => {
         </div>
       )}
 
-      {clears && (
+      {compare && (
         <div className="timeline-compare">
           {monthsSaved > 0 ? (
             <>

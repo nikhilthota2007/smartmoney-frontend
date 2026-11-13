@@ -35,7 +35,10 @@ export const sendChatMessage = async ({ financialData, financialContext, message
 
   const data = await response.json();
   if (!data.success) {
-    throw new Error(data.error || 'Unknown error occurred');
+    const error = new Error(data.error || 'Unknown error occurred');
+    // Written for the user by the server: show it as it is.
+    error.userFacing = Boolean(data.error);
+    throw error;
   }
   return { response: data.response, toolCalls: data.toolCalls || [] };
 };

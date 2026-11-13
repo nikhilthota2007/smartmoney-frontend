@@ -4,11 +4,14 @@ import { MemoryRouter, useLocation, useNavigate } from 'react-router-dom';
 import { AppProviders, AppRoutes, ROUTER_FUTURE } from './Root';
 import { PROFILE_KEY } from './lib/storage';
 import { STATEMENT_KEY } from './app/StatementContext';
-import { categorizeTransactions } from './lib/api';
+import { categorizeTransactions, sendChatMessage } from './lib/api';
+import { buildAdvisorContext } from './lib/aiContext';
+import { migrateProfile } from './lib/profile';
 
 jest.mock('./lib/api', () => ({
   ...jest.requireActual('./lib/api'),
   categorizeTransactions: jest.fn(),
+  sendChatMessage: jest.fn(),
 }));
 
 /** Renders the routed app at `path`, exposing the current location. */
@@ -53,6 +56,7 @@ beforeEach(() => {
   window.localStorage.clear();
   window.scrollTo = jest.fn();
   categorizeTransactions.mockReset();
+  sendChatMessage.mockReset();
 });
 
 describe('routes', () => {
@@ -112,6 +116,12 @@ describe('setup', () => {
     fireEvent.change(screen.getByLabelText('Monthly take-home pay'), { target: { value: '3400' } });
     fireEvent.click(screen.getByRole('button', { name: /continue/i }));
 
+    // Bills that are not on the card, so the surplus is not overstated.
+    expect(screen.getByRole('heading', { name: /what bills go out each month/i })).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText('Rent or mortgage'), { target: { value: '1100' } });
+    fireEvent.change(screen.getByLabelText('Phone and internet'), { target: { value: '85' } });
+    fireEvent.click(screen.getByRole('button', { name: /continue/i }));
+
     expect(screen.getByRole('heading', { name: /show me where it goes/i })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /skip for now/i }));
 
@@ -119,7 +129,21 @@ describe('setup', () => {
     const profile = storedProfile();
     expect(profile.goals).toEqual([expect.objectContaining({ type: 'emergency', name: 'Build a safety net', targetAmount: '3000', source: 'onboarding' })]);
     expect(profile.income[0].netMonthly).toBe('3400');
+    expect(profile.expenses.fixed).toEqual([
+      expect.objectContaining({ category: 'housing', amount: '1100', source: 'bills:housing' }),
+      expect.objectContaining({ category: 'utilities', amount: '85', source: 'bills:phone' }),
+    ]);
     expect(screen.getByText('Build a safety net')).toBeInTheDocument();
+  });
+
+  it('lets the bills step be skipped', () => {
+    renderAt('/start');
+    fireEvent.click(screen.getByRole('button', { name: /^skip$/i }));
+    fireEvent.click(screen.getByRole('button', { name: /continue/i }));
+    expect(screen.getByRole('heading', { name: /what bills go out each month/i })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /^skip$/i }));
+    expect(screen.getByRole('heading', { name: /show me where it goes/i })).toBeInTheDocument();
+    expect(storedProfile().expenses.fixed).toEqual([]);
   });
 
   it('can be skipped entirely', () => {
@@ -209,5 +233,84 @@ describe('the conversation outlives the route', () => {
     expect(location.current.pathname).toBe('/plan');
     expect(screen.getAllByText(GREETING)).toHaveLength(1);
     expect(screen.getByPlaceholderText(/Ask me about saving money/)).toHaveValue('draft question');
+  });
+});
+
+describe('the advisor and the plan agree', () => {
+  /** The preview test: $3,200 a month, rent, a card that never clears on its minimum. */
+  const CARD_CSV = [
+    'Date,Description,Amount',
+    '10/01/2026,NETFLIX.COM,15.49',
+    '10/04/2026,CHEGG STUDY,15.95',
+    '10/05/2026,AMAZON MKTPL*2K4LQ8ZR0,47.99',
+    '10/05/2026,AMAZON MKTPL*7B21XQ93P,47.99',
+    '10/09/2026,DOORDASH*THAI KITCHEN,31.84',
+    '10/15/2026,TRADER JOE S #552,92.10',
+  ].join('\n');
+
+  const seed = () =>
+    window.localStorage.setItem(
+      PROFILE_KEY,
+      JSON.stringify({
+        schemaVersion: 2,
+        income: [{ id: 1, source: 'Pay', netMonthly: '3200', stability: 'stable' }],
+        expenses: { fixed: [{ id: 1, category: 'housing', amount: '1250', source: 'bills:housing' }], variable: [] },
+        debts: [{ id: 1, name: 'Visa', type: 'card', balance: '4701.40', interestRate: '24.99', minPayment: '95' }],
+        goals: [{ id: 1, name: 'Get out of debt', type: 'debt', source: 'onboarding' }],
+      })
+    );
+
+  it('sends the statement brief with the question, and nothing personal', async () => {
+    seed();
+    sendChatMessage.mockResolvedValue({ response: 'Cancel Chegg first.', toolCalls: [] });
+    renderAt('/plan');
+    fireEvent.change(screen.getByLabelText('Choose a statement'), { target: { files: [csvFile(CARD_CSV)] } });
+    await screen.findByRole('article', { name: 'Where it went' });
+
+    fireEvent.change(screen.getByPlaceholderText(/Ask me about saving money/), {
+      target: { value: 'Which subscriptions should I cancel first?' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Send message' }));
+    await screen.findByText('Cancel Chegg first.');
+
+    const { statement } = sendChatMessage.mock.calls[0][0].financialContext;
+    expect(statement.subscriptions.map((item) => item.name)).toEqual(['Chegg', 'Netflix']);
+    expect(statement.possibleDuplicates).toEqual([{ merchant: 'Amazon', amount: 47.99, date: '2026-10-05', count: 2 }]);
+    expect(statement.fixes.map((fix) => fix.title)).toContain('Possible duplicate charge');
+    expect(JSON.stringify(statement)).not.toMatch(/2K4LQ8ZR0|7B21XQ93P|@/);
+  });
+
+  it('shows the plan the advisor is given, with no months-sooner comparison', async () => {
+    seed();
+    renderAt('/plan');
+    fireEvent.change(screen.getByLabelText('Choose a statement'), { target: { files: [csvFile(CARD_CSV)] } });
+    await screen.findByRole('article', { name: 'Where it went' });
+
+    const advisor = buildAdvisorContext(migrateProfile(storedProfile()));
+    const extra = advisor.debtPayoff.recommendedExtraPayment;
+    expect(screen.getByRole('heading', { name: `Your plan: $${extra.toLocaleString('en-US')} a month extra toward your debt` })).toBeInTheDocument();
+    expect(
+      screen.getByText(`Sized from the $${advisor.metrics.monthlySurplus.toLocaleString('en-US')} left each month after spending and bills.`)
+    ).toBeInTheDocument();
+
+    const card = screen.getByRole('article', { name: 'Payoff plan' });
+    expect(within(card).getByText(/Visa never gets paid off at its minimum payment/)).toBeInTheDocument();
+    expect(within(card).queryByText('months sooner')).not.toBeInTheDocument();
+  });
+});
+
+describe('advisor errors', () => {
+  it('shows a message the server wrote once, as written', async () => {
+    const error = new Error("I'm getting a lot of questions right now. Try again in a minute.");
+    error.userFacing = true;
+    sendChatMessage.mockRejectedValue(error);
+    renderAt('/plan');
+
+    fireEvent.change(screen.getByPlaceholderText(/Ask me about saving money/), { target: { value: 'hi' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Send message' }));
+
+    const alert = await screen.findByText("I'm getting a lot of questions right now. Try again in a minute.");
+    expect(alert).toHaveAttribute('role', 'alert');
+    expect(screen.queryByText(/Please try again in a moment\.\./)).not.toBeInTheDocument();
   });
 });
