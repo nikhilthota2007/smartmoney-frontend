@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
+import useRevealOnce from './useRevealOnce';
 
 /**
  * Section 2. The heading reveals once as it scrolls into view, then a coral
@@ -7,22 +8,7 @@ import { Link } from 'react-router-dom';
  */
 const ClaimSection = ({ motion }) => {
   const ref = useRef(null);
-  const [revealed, setRevealed] = useState(false);
-
-  useEffect(() => {
-    if (!motion || !ref.current) return undefined;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setRevealed(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.4 }
-    );
-    observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [motion]);
+  const revealed = useRevealOnce(ref, motion, 0.4);
 
   return (
     <section className={`claim${revealed ? ' is-revealed' : ''}`} ref={ref} aria-labelledby="claim-title">

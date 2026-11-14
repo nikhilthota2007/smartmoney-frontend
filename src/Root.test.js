@@ -62,7 +62,7 @@ beforeEach(() => {
 describe('routes', () => {
   it('serves the landing page at /', async () => {
     renderAt('/');
-    expect(await screen.findByRole('heading', { level: 1, name: /money, minus the dread/i })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { level: 1, name: /your personal money advisor/i })).toBeInTheDocument();
   });
 
   it('goes from the landing page to setup', async () => {
@@ -146,6 +146,28 @@ describe('setup', () => {
     expect(storedProfile().expenses.fixed).toEqual([]);
   });
 
+  it('opens with the goal picked on the landing page', async () => {
+    renderAt('/');
+    fireEvent.click(await screen.findByRole('link', { name: /my cards feel heavy/i }));
+    expect(screen.getByRole('radio', { name: /get out of debt/i })).toBeChecked();
+    // Picked, so the button reads Continue rather than Skip.
+    fireEvent.click(screen.getByRole('button', { name: /continue/i }));
+    expect(storedProfile().goals).toEqual([expect.objectContaining({ type: 'debt', source: 'onboarding' })]);
+  });
+
+  it('ignores a goal it does not know', () => {
+    renderAt('/start?goal=lottery');
+    screen.getAllByRole('radio').forEach((radio) => expect(radio).not.toBeChecked());
+  });
+
+  it('says why it asks, for each question', () => {
+    renderAt('/start');
+    const aside = within(screen.getByRole('complementary', { name: 'Why we ask' }));
+    expect(aside.getByText('Start with one thing.')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /^skip$/i }));
+    expect(aside.getByText('No judgment on the number.')).toBeInTheDocument();
+  });
+
   it('can be skipped entirely', () => {
     const { location } = renderAt('/start');
     fireEvent.click(screen.getByRole('button', { name: /skip to my plan/i }));
@@ -227,7 +249,7 @@ describe('the conversation outlives the route', () => {
     });
 
     act(() => navigate.current('/'));
-    expect(await screen.findByRole('heading', { level: 1, name: /money, minus the dread/i })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { level: 1, name: /your personal money advisor/i })).toBeInTheDocument();
 
     act(() => navigate.current('/plan'));
     expect(location.current.pathname).toBe('/plan');

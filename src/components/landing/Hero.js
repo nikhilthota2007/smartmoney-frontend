@@ -171,9 +171,12 @@ const Hero = ({ demo, motion, sectionRef }) => {
           </Phone>
         </div>
         <div className="hero-copy">
-          <h1 className="hero-title" id="hero-title">
-            <SplitWords text="Money, minus the dread." />
-          </h1>
+          <div className="hero-heading">
+            <h1 className="hero-title" id="hero-title">
+              <SplitWords text="Your personal money advisor." />
+            </h1>
+            <p className="hero-lede">Not sure where to start? That’s fine. We’ll help you find the first step.</p>
+          </div>
           <p className="hero-scroll" aria-hidden="true">
             Scroll
             <ScrollCue />
