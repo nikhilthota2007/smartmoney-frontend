@@ -645,3 +645,29 @@ the card's $350 a month, 13 months and $1,267 surplus. One loose end: it once
 described the fixes as shaving "a month or two" off where the context says
 three.
 
+
+## 15. Round four: advisor message, more landing, full-width setup
+
+1. **Hero.** "Your personal money advisor." with "Not sure where to start?
+   That's fine. We'll help you find the first step." under it. Page and app
+   titles follow.
+2. **After the claim**, four sections, each revealing once on scroll (finished
+   state without motion):
+   - *Start here*: four plain-language doors ("My cards feel heavy"…) that open
+     setup at `/start?goal=…` with that goal already picked.
+   - *Facts* (dark band, numbers count up): 37% of adults couldn't cover a
+     $400 surprise with cash (Federal Reserve SHED, 2025 data); $1.29 trillion
+     on US cards (New York Fed, Q3 2026), each linked to its source; plus two
+     worked examples computed by the app's own planner (`landing/facts.js`):
+     $5,000 at 24% paid at $150 vs $250 a month, and $100 a month for 10 years
+     at the projection's stated 5% assumption.
+   - *Money myths*: six flip cards (credit checks, carrying a balance, small
+     extra payments, small savings, debt as a verdict, fixing everything at
+     once). Without motion they swap instead of turning; focus follows the flip.
+   - *Calm close* (full screen): a breathing circle (4s in, 4s out), "You don't
+     have to figure it all out today.", three steps and the button.
+3. **Setup on wide screens** (≥1024px): a full-height sunrise panel on the left
+   with a line on why each question is asked; the question is centred on the
+   right. Phones are unchanged.
+
+Survey figures go stale: update `SURVEY_FACTS` when the Fed publishes new ones.

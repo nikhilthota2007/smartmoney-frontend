@@ -1,5 +1,5 @@
 import React, { Suspense, lazy, useEffect, useLayoutEffect } from 'react';
-import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import '@fontsource-variable/hanken-grotesk';
 import './index.css';
 import { ProfileProvider } from './context/ProfileContext';
@@ -14,7 +14,7 @@ import ChatWindow from './components/chat/ChatWindow';
 const Landing = lazy(() => import('./components/landing/Landing'));
 
 const TITLES = {
-  '/': 'SmartMoney: money, minus the dread',
+  '/': 'SmartMoney: your personal money advisor',
   '/start': 'Get started · SmartMoney',
   '/plan': 'Your plan · SmartMoney',
   '/numbers': 'Your numbers · SmartMoney',
@@ -32,10 +32,11 @@ const RouteEffects = () => {
   return null;
 };
 
-/** Three questions, then the plan. */
+/** A few questions, then the plan. ?goal= comes from the landing page's doors. */
 const StartRoute = () => {
   const navigate = useNavigate();
-  return <Onboarding onFinish={() => navigate('/plan')} />;
+  const [params] = useSearchParams();
+  return <Onboarding initialGoal={params.get('goal')} onFinish={() => navigate('/plan')} />;
 };
 
 /** The detailed editor: every income, expense, debt, account and goal. */

@@ -26,6 +26,30 @@ export const BILLS = [
 ];
 const billSource = (key) => `bills:${key}`;
 
+/** The setup screen's sunrise, for the wide layout's side panel. */
+const OnboardArt = () => (
+  <svg className="onboard-art" viewBox="0 0 600 900" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <defs>
+      <linearGradient id="onboard-sky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stopColor="var(--art-sky-top)" />
+        <stop offset="0.55" stopColor="var(--art-sky-mid)" />
+        <stop offset="0.8" stopColor="var(--art-peach)" />
+        <stop offset="1" stopColor="var(--art-butter)" />
+      </linearGradient>
+      <radialGradient id="onboard-sun">
+        <stop offset="0" stopColor="var(--art-sun-core)" />
+        <stop offset="0.6" stopColor="var(--art-sun)" />
+        <stop offset="1" stopColor="var(--art-sun)" stopOpacity="0" />
+      </radialGradient>
+    </defs>
+    <rect width="600" height="900" fill="url(#onboard-sky)" />
+    <circle className="onboard-art-sun" cx="300" cy="690" r="150" fill="url(#onboard-sun)" />
+    <path d="M0 700 C120 640 220 690 320 650 S520 600 600 640 V900 H0Z" fill="var(--art-ridge)" />
+    <path d="M0 760 C140 720 260 770 380 735 S540 700 600 720 V900 H0Z" fill="var(--art-hill)" />
+    <path d="M0 830 C160 800 300 845 440 815 S560 800 600 810 V900 H0Z" fill="var(--art-ground)" />
+  </svg>
+);
+
 const choiceFor = (goal) => (goal ? GOAL_CHOICES.find((choice) => choice.type === goal.type) || null : null);
 
 /**
@@ -33,14 +57,16 @@ const choiceFor = (goal) => (goal ? GOAL_CHOICES.find((choice) => choice.type ==
  * the bills that go out before anything else, and a statement. Every step can
  * be skipped; all of it can be changed later from My finances.
  */
-const Onboarding = ({ onFinish, numbersPath = '/numbers' }) => {
+const Onboarding = ({ onFinish, numbersPath = '/numbers', initialGoal = null }) => {
   const { profile, addItem, updateItem, removeItem } = useProfile();
   const { saved } = useStatement();
   const existingGoal = profile.goals.find((goal) => goal.source === 'onboarding');
   const existingIncome = profile.income[0];
 
   const [step, setStep] = useState(0);
-  const [choice, setChoice] = useState(() => choiceFor(existingGoal));
+  const [choice, setChoice] = useState(
+    () => choiceFor(existingGoal) || GOAL_CHOICES.find((option) => option.key === initialGoal) || null
+  );
   const [goalName, setGoalName] = useState(existingGoal && choiceFor(existingGoal)?.name ? existingGoal.name : '');
   const [goalAmount, setGoalAmount] = useState(existingGoal ? existingGoal.targetAmount || '' : '');
   const [goalDate, setGoalDate] = useState(existingGoal ? existingGoal.targetDate || '' : '');
@@ -92,6 +118,10 @@ const Onboarding = ({ onFinish, numbersPath = '/numbers' }) => {
 
   const steps = [
     {
+      aside: {
+        title: 'Start with one thing.',
+        body: 'You don’t have to fix everything at once. Pick what feels loudest right now; the plan grows from there.',
+      },
       title: 'What would make money feel lighter?',
       sub: 'Pick the one that matters most right now. You can change it any time.',
       body: (
@@ -162,6 +192,10 @@ const Onboarding = ({ onFinish, numbersPath = '/numbers' }) => {
       ),
     },
     {
+      aside: {
+        title: 'No judgment on the number.',
+        body: 'Big, small or all over the place, it’s just where we start. A rough guess is fine, and it stays on this device.',
+      },
       title: 'What lands in your account each month?',
       sub: 'After tax. A rough number is fine.',
       body: (
@@ -186,6 +220,10 @@ const Onboarding = ({ onFinish, numbersPath = '/numbers' }) => {
       ),
     },
     {
+      aside: {
+        title: 'Bills first, then the rest.',
+        body: 'Knowing what’s already spoken for is how we find what’s actually free. That’s the number your plan is built on.',
+      },
       title: 'What bills go out each month?',
       sub: 'The ones that are not on your card: rent, utilities, phone, insurance. Rough is fine, and you can skip this.',
       body: (
@@ -212,6 +250,10 @@ const Onboarding = ({ onFinish, numbersPath = '/numbers' }) => {
       ),
     },
     {
+      aside: {
+        title: 'Your statement stays yours.',
+        body: 'We read it in your browser and remove names, addresses and account numbers before anything is sent.',
+      },
       title: 'Show me where it goes.',
       sub: 'Add your latest credit card or bank statement. You will get the spending breakdown, the fixes and what they mean for your goal.',
       body: (
@@ -234,6 +276,14 @@ const Onboarding = ({ onFinish, numbersPath = '/numbers' }) => {
   return (
     <div className="onboard">
       <span className="advisor-glow" aria-hidden="true" />
+      <aside className="onboard-aside" aria-label="Why we ask">
+        <OnboardArt />
+        <div className="onboard-aside-copy" key={step}>
+          <p className="onboard-aside-kicker">Your money advisor</p>
+          <p className="onboard-aside-title">{current.aside.title}</p>
+          <p className="onboard-aside-body">{current.aside.body}</p>
+        </div>
+      </aside>
       <header className="onboard-bar">
         <AppBrand />
         <button className="btn btn-quiet btn-small" onClick={onFinish}>

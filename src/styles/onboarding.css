@@ -1,4 +1,4 @@
-/* Setup (/start): three questions, one at a time, full height. */
+/* Setup (/start): four questions, one at a time, full height. */
 
 .onboard {
   display: grid;
@@ -207,5 +207,103 @@
     background: none;
     box-shadow: none;
     padding-bottom: var(--space-5);
+  }
+}
+
+/* ---------- Wide screens: a side panel, and the question centred ---------- */
+
+.onboard-aside {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .onboard {
+    grid-template-columns: minmax(380px, 42%) minmax(0, 1fr);
+  }
+
+  .onboard-bar,
+  .onboard-progress,
+  .onboard-main,
+  .onboard-actions {
+    grid-column: 2;
+  }
+
+  .onboard-aside {
+    position: sticky;
+    top: 0;
+    grid-column: 1;
+    grid-row: 1 / -1;
+    display: block;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    background: var(--art-sky-top);
+    color: var(--art-text);
+  }
+
+  .onboard-art {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .onboard-aside-copy {
+    position: relative;
+    max-width: 560px;
+    padding: calc(var(--header-height) + var(--space-8)) clamp(48px, 5vw, 112px) 0;
+    text-shadow: 0 1px 24px var(--art-text-shadow);
+    animation: question-in 620ms var(--ease-snap) both;
+  }
+
+  .onboard-aside-kicker {
+    font-size: var(--text-small);
+    font-weight: var(--weight-medium);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--art-butter);
+  }
+
+  .onboard-aside-title {
+    margin-top: var(--space-2);
+    font-size: clamp(2.25rem, 1.5rem + 1.6vw, 3.25rem);
+    font-weight: var(--weight-light);
+    line-height: var(--leading-tight);
+  }
+
+  .onboard-aside-body {
+    margin-top: var(--space-3);
+    font-size: 1.125rem;
+    font-weight: var(--weight-light);
+    line-height: 1.5;
+    opacity: 0.92;
+  }
+
+  .onboard-progress,
+  .onboard-main,
+  .onboard-actions {
+    max-width: calc(640px + 2 * var(--gutter));
+  }
+
+  .onboard-main {
+    align-self: center;
+    padding-block: var(--space-6);
+  }
+
+  .advisor-glow {
+    left: 55%;
+  }
+}
+
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  .onboard-art-sun {
+    animation: sun-rise 1600ms var(--ease-snap) both;
+  }
+
+  @keyframes sun-rise {
+    from {
+      transform: translateY(80px);
+      opacity: 0.4;
+    }
   }
 }
